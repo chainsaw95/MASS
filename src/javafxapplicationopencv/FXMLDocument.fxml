@@ -12,14 +12,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="497.0" prefWidth="675.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxapplicationopencv.FXMLDocumentController">
+<AnchorPane id="AnchorPane" prefHeight="497.0" prefWidth="675.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxapplicationopencv.FXMLDocumentController">
     <children>
-        <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
-      <ImageView fx:id="imagevw" fitHeight="365.0" fitWidth="632.0" layoutX="24.0" layoutY="24.0" pickOnBounds="true" preserveRatio="true">
-         <effect>
-            <Glow />
-         </effect>
-      </ImageView>
       <JFXButton fx:id="startbutton" buttonType="RAISED" layoutX="135.0" layoutY="410.0" onAction="#startButton" prefHeight="37.0" prefWidth="133.0" ripplerFill="#25fc11" text="START" textFill="#51ff00">
          <font>
             <Font name="Arial Rounded MT Bold" size="17.0" />
@@ -30,5 +24,10 @@
             <Font name="Arial Rounded MT Bold" size="17.0" />
          </font>
       </JFXButton>
+      <ImageView fitHeight="366.0" fitWidth="658.0" layoutX="9.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true">
+         <effect>
+            <Glow level="0.99" />
+         </effect>
+      </ImageView>
     </children>
 </AnchorPane>
