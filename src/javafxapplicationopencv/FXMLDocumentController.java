@@ -3,20 +3,22 @@ package javafxapplicationopencv;
 import com.jfoenix.controls.JFXButton;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
-import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfByte;
-import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 
 public class FXMLDocumentController {
@@ -30,23 +32,47 @@ public class FXMLDocumentController {
     @FXML
     private JFXButton stopbutton;
 
+    
+    @FXML
+    private JFXButton settings;
+
+    
+    @FXML
+    private JFXButton videos;
+
+    @FXML
+    private JFXButton clock;
+
+    
     private ScheduledExecutorService timer;
+
     //opencv declarations 
     VideoCapture capture;
     Mat webcamMatImage = new Mat();
     Image i1;
+    int i=0;
 
     //program variables
     boolean cameraActive;
 
     
-
     public void initialize() {
         this.capture = new VideoCapture();
         this.cameraActive = false;
     }
-
+    
+    
+  
     private void preprocess() {
+        
+         Mat frame = new Mat();
+	 Mat firstFrame = new Mat();
+	 Mat gray = new Mat();
+	 Mat frameDelta = new Mat();
+	 Mat thresh = new Mat();
+	 List<MatOfPoint> cnts = new ArrayList<MatOfPoint>();
+        
+       
 
         if (!this.cameraActive) {
             // start the video capture
@@ -57,37 +83,60 @@ public class FXMLDocumentController {
                 this.cameraActive = true;
 
                 // grab a frame every 33 ms (30 frames/sec)
-                Runnable frameGrabber = new Runnable() {
-
-                    @Override
-                    public void run() {
-                        capture.read(webcamMatImage);
-
-                        if (!webcamMatImage.empty()) {
-                            i1 = mat2Image(webcamMatImage);
+                Runnable frameGrabber = () -> {
+                int j=0;
+                capture.read(frame);
+		
+            //convert to grayscale and set the first frame
+		Imgproc.cvtColor(frame, firstFrame, Imgproc.COLOR_BGR2GRAY);
+		Imgproc.GaussianBlur(firstFrame, firstFrame, new Size(21, 21), 0);
+		
+		while(capture.read(frame)) {
+			//convert to grayscale
+			Imgproc.cvtColor(frame, gray, Imgproc.COLOR_BGR2GRAY);
+			Imgproc.GaussianBlur(gray, gray, new Size(21, 21), 0);
+			
+			//compute difference between first frame and current frame
+			Core.absdiff(firstFrame, gray, frameDelta);
+			Imgproc.threshold(frameDelta, thresh, 25, 255, Imgproc.THRESH_BINARY);
+			
+			Imgproc.dilate(thresh, thresh, new Mat(), new Point(-1, -1), 2);
+			Imgproc.findContours(thresh, cnts, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+			
+			for(int i=0; i < cnts.size(); i++) {
+				if(Imgproc.contourArea(cnts.get(i)) < 50000) {
+					continue;
+				}
+				
+			System.out.println("Motion detected:"+j);
+                        j++;
+                        if (!frame.empty()) {
+                            i1 = mat2Image(frame);
                             imagevw.setImage(i1);
-
+                        
                         }
+         
+                        }
+          
                     }
+                          
                 };
 
                 this.timer = Executors.newSingleThreadScheduledExecutor();
-                this.timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
+                this.timer.scheduleAtFixedRate(frameGrabber, 0, 333, TimeUnit.MILLISECONDS);
 
             } else {
-                // log the error
+                
                 System.err.println("Impossible to open the camera connection...");
             }
         } else {
             // the camera is not active at this point
             this.cameraActive = false;
-
             // stop the timer
             this.stopAcquisition();
         }
 
     }
-
     
     // converting an opencv mat object to an image
     private static Image mat2Image(Mat frame) {
@@ -116,6 +165,7 @@ public class FXMLDocumentController {
         System.arraycopy(sourcePixels, 0, targetPixels, 0, sourcePixels.length);
 
         return image;
+    
     }
 
     
@@ -150,6 +200,7 @@ public class FXMLDocumentController {
 
         //  this.start();
         this.initialize();
+       // this.motion();
         this.preprocess();
 
     }
