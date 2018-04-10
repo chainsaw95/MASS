@@ -12,21 +12,18 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="497.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxapplicationopencv.FXMLDocumentController">
+<AnchorPane id="AnchorPane" prefHeight="497.0" prefWidth="675.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxapplicationopencv.FXMLDocumentController">
     <children>
-      <JFXButton fx:id="startbutton" buttonType="RAISED" layoutX="39.0" layoutY="410.0" onAction="#startButton" prefHeight="37.0" prefWidth="133.0" ripplerFill="#25fc11" style="-fx-border-color: black;" text="START" textFill="#51ff00">
+      <JFXButton fx:id="startbutton" buttonType="RAISED" layoutX="39.0" layoutY="410.0" onAction="#startButton" prefHeight="37.0" prefWidth="193.0" ripplerFill="#25fc11" style="-fx-border-color: black;" text="START" textFill="#51ff00">
          <font>
             <Font name="Arial Rounded MT Bold" size="17.0" />
          </font>
       </JFXButton>
-      <JFXButton fx:id="stopbutton" buttonType="RAISED" layoutX="219.0" layoutY="410.0" onAction="#stopButton" prefHeight="37.0" prefWidth="133.0" ripplerFill="#fa1111" style="-fx-border-color: black;" text="STOP" textFill="#db2f21">
+      <JFXButton fx:id="stopbutton" buttonType="RAISED" layoutX="408.0" layoutY="410.0" onAction="#stopButton" prefHeight="37.0" prefWidth="214.0" ripplerFill="#fa1111" style="-fx-border-color: black;" text="STOP" textFill="#db2f21">
          <font>
             <Font name="Arial Rounded MT Bold" size="17.0" />
          </font>
       </JFXButton>
-      <ImageView fx:id="imagevw" fitHeight="360.0" fitWidth="478.0" layoutX="28.0" layoutY="24.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="28.0" />
-      <JFXButton fx:id="clock" buttonType="RAISED" layoutX="540.0" layoutY="40.0" prefHeight="101.0" prefWidth="106.0" ripplerFill="#eb1515f5" style="-fx-background-image: ./resources/clocks.svg;" text="Clock" />
-      <JFXButton fx:id="videos" buttonType="RAISED" layoutX="540.0" layoutY="162.0" prefHeight="101.0" prefWidth="106.0" ripplerFill="#c31111f5" text="Settings" />
-      <JFXButton fx:id="settings" buttonType="RAISED" layoutX="540.0" layoutY="283.0" prefHeight="101.0" prefWidth="106.0" ripplerFill="#dd1212f5" text="Videos" />
+      <ImageView fx:id="imagevw" fitHeight="360.0" fitWidth="626.0" layoutX="28.0" layoutY="24.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="28.0" />
     </children>
 </AnchorPane>
