@@ -17,6 +17,7 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
@@ -50,8 +51,7 @@ public class FXMLDocumentController {
     VideoCapture capture;
     Mat webcamMatImage = new Mat();
     Image i1;
-    int i=0;
-
+    
     //program variables
     boolean cameraActive;
 
@@ -61,84 +61,140 @@ public class FXMLDocumentController {
         this.cameraActive = false;
     }
     
-    
-  
     private void preprocess() {
-        
-         Mat frame = new Mat();
-	 Mat firstFrame = new Mat();
-	 Mat gray = new Mat();
-	 Mat frameDelta = new Mat();
-	 Mat thresh = new Mat();
-	 List<MatOfPoint> cnts = new ArrayList<MatOfPoint>();
-        
-       
+        Runnable frameGrabber = () -> {
 
-        if (!this.cameraActive) {
-            // start the video capture
-            this.capture.open(0);
+            Mat frame = new Mat();
+            Mat firstFrame = new Mat();
+            Mat secondFrame=new Mat();
+            Mat gray = new Mat();
+            Mat graynew=new Mat();
+            
+            Mat frameDelta = new Mat();
+            Mat thresh = new Mat();
+            Mat contours=new Mat();
+            
+            List<MatOfPoint> cnts = new ArrayList<MatOfPoint>();
 
-            // is the video stream available?
-            if (this.capture.isOpened()) {
-                this.cameraActive = true;
+            if (!this.cameraActive) {
+                // start the video capture
+                this.capture.open(0);
 
-                // grab a frame every 33 ms (30 frames/sec)
-                Runnable frameGrabber = () -> {
-                int j=0;
-                capture.read(frame);
-		
-            //convert to grayscale and set the first frame
-		Imgproc.cvtColor(frame, firstFrame, Imgproc.COLOR_BGR2GRAY);
-		Imgproc.GaussianBlur(firstFrame, firstFrame, new Size(21, 21), 0);
-		
-		while(capture.read(frame)) {
-			//convert to grayscale
-			Imgproc.cvtColor(frame, gray, Imgproc.COLOR_BGR2GRAY);
-			Imgproc.GaussianBlur(gray, gray, new Size(21, 21), 0);
-			
-			//compute difference between first frame and current frame
-			Core.absdiff(firstFrame, gray, frameDelta);
-			Imgproc.threshold(frameDelta, thresh, 25, 255, Imgproc.THRESH_BINARY);
-			
-			Imgproc.dilate(thresh, thresh, new Mat(), new Point(-1, -1), 2);
-			Imgproc.findContours(thresh, cnts, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-			
-			for(int i=0; i < cnts.size(); i++) {
-				if(Imgproc.contourArea(cnts.get(i)) < 50000) {
-					continue;
-				}
-				
-			System.out.println("Motion detected:"+j);
-                        j++;
-                        if (!frame.empty()) {
-                            i1 = mat2Image(frame);
-                            imagevw.setImage(i1);
+                // is the video stream available?
+                if (this.capture.isOpened()) {
+                    this.cameraActive = true;
+
+                    while (true) {
                         
-                        }
-         
-                        }
-          
-                    }
-                          
-                };
+                        //original frame
+                        capture.read(frame);
+                        
+                        
+                        // grab a frame every 33 ms (30 frames/sec)
+                        capture.read(firstFrame);
 
-                this.timer = Executors.newSingleThreadScheduledExecutor();
-                this.timer.scheduleAtFixedRate(frameGrabber, 0, 333, TimeUnit.MILLISECONDS);
+                        //convert to grayscale and set the first frame
+                        Imgproc.cvtColor(firstFrame, gray, Imgproc.COLOR_BGR2GRAY);
+                     //   Imgproc.GaussianBlur(gray, gray, new Size(21, 21), 0);
+                    
+                        try{
+                            Thread.sleep(25);
+                            System.out.println("out of sleep");
+                        }
+                        catch(Exception e){
+                            System.out.println(e);
+                        }
+                      
+                        
+                        
+                        capture.read(secondFrame);
+                        //convert to grayscale
+                        Imgproc.cvtColor(secondFrame, graynew, Imgproc.COLOR_BGR2GRAY);
+                       // Imgproc.GaussianBlur(graynew, graynew, new Size(21, 21), 0);
+
+                        //compute difference between first frame and current frame
+                        Core.absdiff(gray, graynew, frameDelta);
+                        
+
+                        //set true to see the abs difference on imagview
+                        if(true){
+                        if (!frameDelta.empty()){
+                                i1 = mat2Image(frameDelta);
+                                imagevw.setImage(i1);
+                        }
+                        }
+                        
+                     //   Imgproc.threshold(frameDelta, thresh, 25, 255, Imgproc.THRESH_BINARY);
+                     //   Imgproc.dilate(thresh, thresh, new Mat(), new Point(-1, -1), 2);
+                        
+                        
+                        if(false){
+                        if (!thresh.empty()){
+                                i1 = mat2Image(thresh);
+                                imagevw.setImage(i1);
+                        }
+                        }
+                        
+                        
+                
+                        
+                        Imgproc.findContours(frameDelta, cnts, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+                        
+                        
+                        
+                        double maxVal = 0;
+                        int maxValIdx = 0;
+                        for (int contourIdx = 0; contourIdx < cnts.size(); contourIdx++)
+                        {
+                        double contourArea = Imgproc.contourArea(cnts.get(contourIdx));
+                        if (maxVal < contourArea)
+                        {
+                        maxVal = contourArea;
+                        maxValIdx = contourIdx;
+                        }
+                        }
+
+                        Imgproc.drawContours(firstFrame, cnts, 0, new Scalar(0,255,0), 5);
+                        
+                       
+                        if(false){
+                        if (!firstFrame.empty()){
+                                i1 = mat2Image(firstFrame);
+                                imagevw.setImage(i1);
+                        }
+                        }
+                        
+                                 
+                                       
+                     /*   for (int i = 0; i < cnts.size(); i++) {
+                        if (Imgproc.contourArea(cnts.get(i)) < 5000) {
+                               ;
+                        }
+                        else
+                        System.out.println("Motion detected!!!");  
+                        }
+
+                       */
+
+                    }
+
+                }
 
             } else {
-                
+
                 System.err.println("Impossible to open the camera connection...");
             }
-        } else {
-            // the camera is not active at this point
-            this.cameraActive = false;
-            // stop the timer
-            this.stopAcquisition();
-        }
+
+        };
+
+        this.timer = Executors.newSingleThreadScheduledExecutor();
+        this.timer.scheduleAtFixedRate(frameGrabber, 0, 33, TimeUnit.MILLISECONDS);
 
     }
     
-    // converting an opencv mat object to an image
+  
+  
+   // converting an opencv mat object to an image
     private static Image mat2Image(Mat frame) {
         try {
             return SwingFXUtils.toFXImage(matToBufferedImage(frame), null);
