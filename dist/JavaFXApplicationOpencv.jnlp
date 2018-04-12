@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" java-vm-args="-Djava.library.path="C:\opencv\build\java\x64" "  href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="JavaFXApplicationOpencv.jar" size="533729" download="eager" />
+    <jar href="JavaFXApplicationOpencv.jar" size="533999" download="eager" />
     <jar href="lib\jfoenix-8.0.1.jar" size="2405715" download="eager" />
     <jar href="lib\opencv-300.jar" size="301112" download="eager" />
   </resources>

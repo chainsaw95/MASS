@@ -3,6 +3,8 @@ package javafxapplicationopencv;
 import com.jfoenix.controls.JFXButton;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -22,6 +24,7 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
+import sun.audio.*;
 
 public class FXMLDocumentController {
 
@@ -34,48 +37,56 @@ public class FXMLDocumentController {
     @FXML
     private JFXButton stopbutton;
 
-    
     @FXML
     private JFXButton settings;
 
-    
     @FXML
     private JFXButton videos;
 
     @FXML
     private JFXButton clock;
 
-    
     private ScheduledExecutorService timer;
 
     //opencv declarations 
     VideoCapture capture;
     Mat webcamMatImage = new Mat();
     Image i1;
-    
+
     //program variables
     boolean cameraActive;
-
     
+    
+    
+    
+    public void alarm ()throws Exception{
+        
+     InputStream in = new FileInputStream("./resources/A.wav");
+      // create an audiostream from the inputstream
+      AudioStream audioStream;
+      audioStream = new AudioStream(in);
+      // play the audio clip with the audioplayer class
+      AudioPlayer.player.start(audioStream);
+        
+        
+    }
+
     public void initialize() {
         this.capture = new VideoCapture();
         this.cameraActive = false;
         capture.set(Videoio.CV_CAP_PROP_FRAME_WIDTH, 1280);
         capture.set(Videoio.CV_CAP_PROP_FRAME_HEIGHT, 720);
     }
-    
-   
-    
+
     private void preprocess() {
-        
-         Mat frame = new Mat();
-	 Mat firstFrame = new Mat();
-	 Mat gray = new Mat();
-	 Mat frameDelta = new Mat();
-	 Mat thresh = new Mat();
-	 List<MatOfPoint> cnts = new ArrayList<MatOfPoint>();
-        
-       
+
+        Mat frame = new Mat();
+        Mat firstFrame = new Mat();
+        Mat gray = new Mat();
+        Mat frameDelta = new Mat();
+        Mat thresh = new Mat();
+        List<MatOfPoint> cnts = new ArrayList<>();
+
         if (!this.cameraActive) {
             // start the video capture
             this.capture.open(0);
@@ -86,74 +97,73 @@ public class FXMLDocumentController {
 
                 // grab a frame every 33 ms (30 frames/sec)
                 Runnable frameGrabber = () -> {
-                int j=0;
-                
-                //convert to grayscale and set the first frame
-		
-		while(true) {
-                        
+                    int j = 0;
+
+                    //convert to grayscale and set the first frame
+                    while (true) {
+
                         capture.read(frame);
                         Imgproc.cvtColor(frame, firstFrame, Imgproc.COLOR_BGR2GRAY);
                         Imgproc.GaussianBlur(firstFrame, firstFrame, new Size(21, 21), 0);
-		
-                        
-                        
+
                         capture.read(frame);
 
                         //convert to grayscale
-			Imgproc.cvtColor(frame, gray, Imgproc.COLOR_BGR2GRAY);
-			Imgproc.GaussianBlur(gray, gray, new Size(21, 21), 0);
-			
-			//compute difference between first frame and current frame
-			Core.absdiff(firstFrame, gray, frameDelta);
-			Imgproc.threshold(frameDelta, thresh, 25, 255, Imgproc.THRESH_BINARY);
-			
-                        
-                        
-			Imgproc.dilate(thresh, thresh, new Mat(), new Point(-1, -1), 2);
-			
-                        
-                        if(false){
-                            
+                        Imgproc.cvtColor(frame, gray, Imgproc.COLOR_BGR2GRAY);
+                        Imgproc.GaussianBlur(gray, gray, new Size(21, 21), 0);
+
+                        //compute difference between first frame and current frame
+                        Core.absdiff(firstFrame, gray, frameDelta);
+                        Imgproc.threshold(frameDelta, thresh, 25, 255, Imgproc.THRESH_BINARY);
+
+                        Imgproc.dilate(thresh, thresh, new Mat(), new Point(-1, -1), 2);
+
+                        if (false) {
+
                             if (!thresh.empty()) {
-                                    i1 = mat2Image(thresh);
-                                    imagevw.setImage(i1);
-                        
+                                i1 = mat2Image(thresh);
+                                imagevw.setImage(i1);
+
                             }
-                               
+
                         }
-                        
-                     
+
                         Imgproc.findContours(thresh, cnts, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-			for(int i=0; i < cnts.size(); i++) {
-				if(Imgproc.contourArea(cnts.get(i)) > 500) {
-			
-                                    Imgproc.drawContours(frame, cnts, i,new Scalar(0,255,0) , 2);
-                               
-                                    System.out.println("Motion detected:"+j);
-                                    j++;
-                                  
-                                    if (!frame.empty()) {
+                        for (int i = 0; i < cnts.size(); i++) {
+                            if (Imgproc.contourArea(cnts.get(i)) > 5) {
+
+                                Imgproc.drawContours(frame, cnts, i, new Scalar(0, 255, 0), 2);
+
+                                System.out.println("Motion detected:" + j);
+                                try{
+                                this.alarm();
+                                }
+                                catch(Exception e){
+                                    System.out.println(e);
+                                }
+                                j++;
+
+                                if (!frame.empty()) {
                                     i1 = mat2Image(frame);
                                     imagevw.setImage(i1);
-                                    }
-                              
+                                }
+
                             }
-         
+
                         }
-                        
+
                         cnts.clear();
-          
+
                     }
-                          
+
                 };
 
                 this.timer = Executors.newSingleThreadScheduledExecutor();
-                this.timer.scheduleAtFixedRate(frameGrabber, 0, 60, TimeUnit.MILLISECONDS);
+                this.timer.scheduleAtFixedRate(frameGrabber, 0, 20, TimeUnit.MILLISECONDS);
 
             } else {
-                
+
                 System.err.println("Impossible to open the camera connection...");
             }
         } else {
@@ -163,13 +173,8 @@ public class FXMLDocumentController {
         }
 
     }
-    
-    
-    
-    
- 
-    
-   // converting an opencv mat object to an image
+
+    // converting an opencv mat object to an image
     private static Image mat2Image(Mat frame) {
         try {
             return SwingFXUtils.toFXImage(matToBufferedImage(frame), null);
@@ -196,10 +201,9 @@ public class FXMLDocumentController {
         System.arraycopy(sourcePixels, 0, targetPixels, 0, sourcePixels.length);
 
         return image;
-    
+
     }
 
-    
     private void stopAcquisition() {
         if (this.timer != null && !this.timer.isShutdown()) {
             try {
@@ -231,7 +235,7 @@ public class FXMLDocumentController {
 
         //  this.start();
         this.initialize();
-       // this.motion();
+        // this.motion();
         this.preprocess();
 
     }
@@ -240,7 +244,7 @@ public class FXMLDocumentController {
     void stopButton(ActionEvent event) {
 
         this.stopAcquisition();
-        
+
     }
 
     @FXML
