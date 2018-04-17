@@ -12,7 +12,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="497.0" prefWidth="675.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxapplicationopencv.FXMLDocumentController">
+<AnchorPane id="AnchorPane" prefHeight="497.0" prefWidth="675.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxapplicationopencv.FXMLDocumentController">
     <children>
       <JFXButton fx:id="startbutton" buttonType="RAISED" layoutX="39.0" layoutY="410.0" onAction="#startButton" prefHeight="37.0" prefWidth="193.0" ripplerFill="#25fc11" style="-fx-border-color: black;" text="START" textFill="#51ff00">
          <font>
@@ -24,6 +24,16 @@
             <Font name="Arial Rounded MT Bold" size="17.0" />
          </font>
       </JFXButton>
-      <ImageView fx:id="imagevw" fitHeight="360.0" fitWidth="626.0" layoutX="28.0" layoutY="24.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="28.0" />
+      <ImageView fx:id="imagevw" fitHeight="360.0" fitWidth="504.0" layoutX="28.0" layoutY="24.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="28.0" />
+      <JFXButton fx:id="settings" buttonType="RAISED" layoutX="546.0" layoutY="78.0" onAction="#onSettings" prefHeight="37.0" prefWidth="115.0" ripplerFill="#fa1111" style="-fx-border-color: black;" text="Settings" textFill="#db2f21">
+         <font>
+            <Font name="Arial Rounded MT Bold" size="17.0" />
+         </font>
+      </JFXButton>
+      <JFXButton fx:id="videos" buttonType="RAISED" layoutX="546.0" layoutY="150.0" onAction="#onVideos" prefHeight="37.0" prefWidth="115.0" ripplerFill="#fa1111" style="-fx-border-color: black;" text="Videos" textFill="#db2f21">
+         <font>
+            <Font name="Arial Rounded MT Bold" size="17.0" />
+         </font>
+      </JFXButton>
     </children>
 </AnchorPane>

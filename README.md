@@ -1,5 +1,15 @@
 ## (MASS) Motion Activated Surveillance System
 
+by 
+
+Ashwini Singh
+
+Faraz Husain
+
+Vivek Singh
+
+
+
 Here is a list of used classed and links to the documentation if you are looking forward to implementing your own javafx+opencv project.
 
 
@@ -88,4 +98,42 @@ Here is a list of used classed and links to the documentation if you are looking
 
 https://docs.opencv.org/java/3.0.0/org/opencv/videoio/Videoio.html
 
- 
+
+
+# Steps to Detect Motion
+
+
+
+### Black and white Conversion
+
+
+
+![Black and White Converison](C:\Users\Vivek\Documents\bw.gif)
+
+
+
+### Blurring the video to reduce noise if any
+
+![](C:\Users\Vivek\Documents\blur.gif)
+
+
+
+### Compute absolute Difference 
+
+![](C:\Users\Vivek\Documents\diff.gif)
+
+###  
+
+### Calculate Threshold
+
+![](C:\Users\Vivek\Documents\thresh.gif)
+
+
+
+### Calculating and Drawing Contours
+
+![](C:\Users\Vivek\Documents\contour.gif)
+
+
+
+* If the area of the contour is more than the specified threshold it treats it as motion.

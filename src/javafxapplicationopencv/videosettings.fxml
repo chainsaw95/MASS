@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import com.jfoenix.controls.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxapplicationopencv.VideosettingsController">
+   <children>
+      <Pane layoutX="14.0" layoutY="12.0" prefHeight="112.0" prefWidth="577.0">
+         <children>
+            <JFXSlider id="sliderbar" fx:id="motionSense" blockIncrement="1000.0" layoutX="12.0" layoutY="56.0" max="5000.0" min="50.0" prefHeight="14.0" prefWidth="554.0" />
+            <Text layoutX="7.0" layoutY="17.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Motion Sensitivity (Threshold)" wrappingWidth="262.13671875">
+               <font>
+                  <Font name="Calibri" size="14.0" />
+               </font>
+            </Text>
+         </children>
+      </Pane>
+      <Pane layoutX="14.0" layoutY="124.0" prefHeight="253.0" prefWidth="561.0">
+         <children>
+            <Text layoutX="21.0" layoutY="36.0" strokeType="OUTSIDE" strokeWidth="0.0" text="FPS:" />
+            <Text layoutX="296.0" layoutY="36.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Video Capture: with camera no:" />
+            <JFXRadioButton fx:id="original" layoutX="21.0" layoutY="88.0" prefHeight="17.0" prefWidth="154.0" text="Original">
+               <toggleGroup>
+                  <ToggleGroup fx:id="radiogroup" />
+               </toggleGroup></JFXRadioButton>
+            <JFXRadioButton fx:id="difference" layoutX="21.0" layoutY="118.0" prefHeight="17.0" prefWidth="154.0" text="Difference" toggleGroup="$radiogroup" />
+            <JFXRadioButton fx:id="threshold" layoutX="21.0" layoutY="148.0" prefHeight="17.0" prefWidth="154.0" text="Threshold" toggleGroup="$radiogroup" />
+            <JFXRadioButton fx:id="grayscale" layoutX="22.0" layoutY="180.0" prefHeight="17.0" prefWidth="154.0" text="GrayScale" toggleGroup="$radiogroup" />
+            <JFXTextField fx:id="fpsTextField" layoutX="56.0" layoutY="19.0" prefHeight="25.0" prefWidth="61.0" />
+            <JFXTextField fx:id="camnoTextField" layoutX="487.0" layoutY="12.0" prefHeight="25.0" prefWidth="61.0" />
+            <JFXRadioButton fx:id="contours" layoutX="21.0" layoutY="209.0" prefHeight="17.0" prefWidth="154.0" text="Contours" toggleGroup="$radiogroup" />
+            <Button fx:id="save" layoutX="341.0" layoutY="141.0" mnemonicParsing="false" onAction="#saveSetting" prefHeight="32.0" prefWidth="154.0" text="Save Settings" textFill="#21d721">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Button>
+            <Button fx:id="reset" layoutX="341.0" layoutY="189.0" mnemonicParsing="false" onAction="#resetSetting" prefHeight="32.0" prefWidth="154.0" text="Reset Settings" textFill="#e12e2e">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Button>
+         </children>
+      </Pane>
+   </children>
+</AnchorPane>
