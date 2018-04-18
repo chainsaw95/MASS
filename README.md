@@ -1,14 +1,5 @@
 ## (MASS) Motion Activated Surveillance System
 
-by 
-
-Ashwini Singh
-
-Faraz Husain
-
-Vivek Singh
-
-
 
 Here is a list of used classed and links to the documentation if you are looking forward to implementing your own javafx+opencv project.
 
@@ -17,6 +8,8 @@ Here is a list of used classed and links to the documentation if you are looking
 - BufferedImage  [See here](https://docs.oracle.com/javase/7/docs/api/java/awt/image/BufferedImage.html)
 
 * DataBufferByte [See here](https://docs.oracle.com/javase/7/docs/api/java/awt/image/DataBufferByte.html)
+
+
 * ClassArrayList  [See here](https://docs.oracle.com/javase/7/docs/api/java/util/ArrayList.html)
 * List [See here](https://docs.oracle.com/javase/8/docs/api/java/util/List.html)
 * Executors [See here](https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Executors.html)
@@ -108,32 +101,32 @@ https://docs.opencv.org/java/3.0.0/org/opencv/videoio/Videoio.html
 
 
 
-![Black and White Converison](C:\Users\Vivek\Documents\bw.gif)
+![Black and White Converison](.\resources\bw-min.gif)
 
 
 
 ### Blurring the video to reduce noise if any
 
-![](C:\Users\Vivek\Documents\blur.gif)
+![](.\resources\blur-min.gif)
 
 
 
 ### Compute absolute Difference 
 
-![](C:\Users\Vivek\Documents\diff.gif)
+![](.\resources\diff-min.gif)
 
-###  
+ 
 
 ### Calculate Threshold
 
-![](C:\Users\Vivek\Documents\thresh.gif)
+![](.\resources\thresh-min.gif)
 
 
 
 ### Calculating and Drawing Contours
 
-![](C:\Users\Vivek\Documents\contour.gif)
-
+![](.\resources\contour-min.gif)
 
 
 * If the area of the contour is more than the specified threshold it treats it as motion.
+
