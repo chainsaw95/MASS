@@ -101,31 +101,31 @@ https://docs.opencv.org/java/3.0.0/org/opencv/videoio/Videoio.html
 
 
 
-![Black and White Converison](.\resources\bw-min.gif)
+![](./resources/bw-min.gif)
 
 
 
 ### Blurring the video to reduce noise if any
 
-![](.\resources\blur-min.gif)
+![](./resources/blur-min.gif)
 
 
 
 ### Compute absolute Difference 
 
-![](.\resources\diff-min.gif)
+![](./resources/diff-min.gif)
 
  
 
 ### Calculate Threshold
 
-![](.\resources\thresh-min.gif)
+![](./resources/thresh-min.gif)
 
 
 
 ### Calculating and Drawing Contours
 
-![](.\resources\contour-min.gif)
+![](./resources/contour-min.gif)
 
 
 * If the area of the contour is more than the specified threshold it treats it as motion.
