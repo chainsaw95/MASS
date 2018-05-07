@@ -1,0 +1,5095 @@
+//practice programs for plsql
+
+//creating a table
+create table vivek(name varchar2(20),age number,rollno number)
+
+//desc the table
+desc vivek
+
+//inserting values into table
+insert into vivek values('Altaf',19,55)
+
+
+
+
+//using select into
+//%type is anchored data type can be used with databse colum or prev def var
+declare
+name vivek.name%type;
+begin
+select name into name from vivek name where age=22;
+dbms_output.put_line(name); 
+end;
+
+//declaring a constant
+
+declare
+pi constant number(7,6):=3.14192;
+begin
+dbms_output.put_line(pi);
+end;
+
+
+
+//declaring bind variable in plsql
+// think of it as variable of global scope
+//not declared inside a block
+
+VARIABLE myvar number(20);
+
+//initialize bind variable
+
+EXEC: myvar:=1000;
+
+//if statement
+
+declare
+num number:=10;
+begin
+if num <11 and num >10  then
+dbms_output.put_line('Condition passed');
+end if;
+end;
+
+
+//if else
+declare
+num number:=10;
+begin
+if num <11 and num >10  then
+dbms_output.put_line('Condition passed');
+else
+dbms_output.put_line('Condition failed');
+end if;
+end;
+
+
+declare
+num number:=:enter;
+begin
+if num <11 and num >10  then
+dbms_output.put_line('Condition passed');
+else
+dbms_output.put_line('Condition failed');
+end if;
+end;
+
+// spelling for else if is not elseif its elsif
+
+//simple loop
+
+declare
+i number:=0;
+begin
+
+loop
+
+dbms_output.put_line(i);
+i:=i+1;
+exit when i>10;
+end loop;
+
+
+end;
+
+
+//no need to declare i it is an implicit index vairvale
+// for loops
+declare
+i number:=0;
+begin
+
+for i in reverse 1..1000 loop
+
+dbms_output.put_line(i);
+
+end loop;
+end;
+
+
+// cursor in plsql
+
+declare
+vname vivek.name%type;
+cursor mycur is select name from vivek where age=22;
+begin
+open mycur;
+fetch mycur into vname;
+dbms_output.put_line(vname);
+close mycur;
+end;
+
+
+
+// cursors
+
+declare
+name EMP.ENAME%type;
+cursor getname is select ENAME from EMP where SAL>200;
+begin
+open getname;
+loop
+fetch getname into name;
+dbms_output.put_line(name);
+exit when getname%notfound;
+end loop;
+close getname;
+end;
+
+
+// Records in PLSQL
+declare
+myrec VIVEK%ROWTYPE;
+cursor mycur is select * from vivek;
+begin
+for myrec in mycur
+loop
+dbms_output.put_line(myrec.name||myrec.age);
+end loop;
+end;
+
+
+declare
+var VIVEK%ROWTYPE;
+begin
+select * into var from vivek where age=22;
+dbms_output.put_line(var.name||' aged:  '||var.age);
+end;
+
+
+declare
+cursor mycur is select name,age from vivek where age=22;
+myrec mycur%rowtype;
+begin
+open mycur;
+fetch mycur into myrec;
+dbms_output.put_line(myrec.name||myrec.age);
+end;
+
+
+declare
+type myrec is record(
+    name varchar2(20),
+    age number);
+myrecvar myrec;
+begin
+    myrecvar.name:='Vivek';
+    myrecvar.age:=22;
+   
+    dbms_output.put_line(myrecvar.name);
+end;
+
+
+
+
+create or replace function myfunc(var1 number,var2 number) return number is 
+begin
+if var1 > var2  then
+return var1;
+else
+return var2;
+end if;
+end;
+
+
+begin
+dbms_output.put_line(myfunc(1,2));
+end;
+
+
+create or replace function myfunc(var1 number,var2 number) 
+return number is 
+myvar number;
+begin
+if var1 > var2  then
+return var1;
+else
+return var2;
+end if;
+end;
+
+
+begin
+dbms_output.put_line(myfunc(1,2));
+end;
+
+
+
+create or replace procedure myproc is
+name varchar2(20):='Vivek';
+begin
+dbms_output.put_line(name);
+end;
+
+
+begin
+myproc;
+end;
+
+
+
+
+declare
+type mynestedtable is table of number;
+varmytb mynestedtable:=mynestedtable(1,6,8,9,5);
+begin
+for i in 1..5
+loop
+dbms_output.put_line(varmytb(i));
+end loop;
+end;
+
+
+declare
+type mynestedtable is table of number;
+varmytb mynestedtable:=mynestedtable(1,6,8,9,5);
+begin
+for i in 1..varmytb.count
+loop
+dbms_output.put_line(varmytb(i));
+end loop;
+end;
+
+
+
+// nested table as database object
+
+create or replace type mynestedtable is table of number;
+
+
+
+create or replace type mynestedtable is table of number;
+
+
+create table mydummy(
+
+ name varchar2(20),
+ mynum mynestedtable
+)nested table mynum store as nested_space_tab;  
+
+desc mydummy
+
+insert into mydummy values('Vivek',mynestedtable(1,2,3,4,5));
+
+select * from mydummy
+
+
+
+declare
+type mysso is table of number index by varchar2(20);
+mytab mysso;
+begin
+mytab('Book1'):=1;
+mytab('Book2'):=2;
+mytab('Book3'):=3;
+mytab('Book4'):=4;
+
+dbms_output.put_line(mytab('Book1'));
+end;
+
+
+
+declare
+type mysso is table of number index by varchar2(20);
+mytab mysso;
+flag varchar2(20);
+begin
+
+ mytab('Book1'):=1; 
+ mytab('Book2'):=2;
+ mytab('Book3'):=3;
+ mytab('Book4'):=4;
+
+ flag:=mytab.first;
+  while flag is not null
+  loop
+  dbms_output.put_line(mytab(flag));
+  flag:=mytab.next(flag);
+  end loop;
+end;
+
+
+
+declare
+type mystrongcur is ref cursor return VIVEK%ROWTYPE;
+myvar mystrongcur;
+myrec vivek%rowtype;
+begin
+open myvar for select * from vivek where age=22;
+fetch myvar into myrec;
+dbms_output.put_line(myrec.name);
+end;
+
+
+
+declare
+myvar SYS_REFCURSOR;
+myrec vivek%rowtype;
+begin
+open myvar for select * from vivek where age=22;
+fetch myvar into myrec;
+dbms_output.put_line(myrec.name);
+end;
+
+
+declare
+type myarray is varray(30) of EMP.ENAME%TYPE;
+myvar myarray;
+begin
+select ENAME bulk collect into myvar from emp;
+for i in 1..myvar.count
+loop
+dbms_output.put_line(myvar(i));
+end loop;
+end;
+
+
+
+
+
+Skip to content
+Using Gmail with screen readers
+Conversations
+	
+	
+	
+	
+edX
+	
+🤗 15 trending courses. Find yours today!
+ - Discover exciting courses in Marketing Analytics, Project Management, Animal Ethics and more! Sign Into Your Account What do you want to learn? Explore exciting
+	 
+	9:04 PM
+	
+	
+	
+	
+Faraz Hussain
+	
+Fwd: plsql programs
+ - ---------- Forwarded message --------- From: Faraz Hussain <faraaz786husain@gmail.com> Date: Sat, May 5, 2018, 23:09 Subject: plsql programs To: <geetanjalia1995@gmail.com>
+Attachments
+pl sql.txt
+plsql ques.txt
+plsql.txt
+	
+	7:27 PM
+	
+	
+	
+	
+Freeletics
+	
+Hypertrophy: It is time to go big!
+ - When it comes to muscle, size matters. Let’s be honest, who doesn’t like to see the results of their hard work in the mirror? But did you know that hypertrophy,
+	 
+	3:50 PM
+	
+	
+	
+	
+Amazon.in
+	
+Amazon recommends "Elove® Dual Port USB Charger..." and more
+ - Your Amazon.in Today's Deals Get Amazon App Hello Vivek Singh, Here are personalized recommendations for you based on items you purchased or reviewed. Click her
+	 
+	5:50 AM
+	
+	
+	
+	
+Mark Manson
+	
+How self-aware are you?
+ - Hey, Mark here. What do a 16th-century Indian guru, Facebook addiction, spoon castration and bad sexual metaphors all have in common? That's right: another Mark
+	 
+	1:51 AM
+	
+	
+	
+	
+mail
+	
+You are invited to join Examly
+ - Hi Examly user, Welcome to Examly! Please set your password and activate your account by clicking the below link: Activate Account Regards, Team Examly
+	 
+	12:42 AM
+	
+	
+	
+	
+mail
+	
+You have been enrolled in a course
+ - Hi Examly user, You have been newly enrolled in the following course: Informatica Mock Test Regards, Team Examly
+	 
+	12:42 AM
+	
+	
+	
+	
+Ministry of Railway.
+	
+Get Your Meals Delivered to Your Berth
+ - Having trouble reading this email? View in your Mobile/Web browser /PiyushGoyalOfficial @PiyushGoyal www.piyushgoyal.in /RailMinIndia
+	 
+	May 5
+	
+	
+	
+	
+Udacity India
+	
+All New Front-end Nanodegree Program - Explore Now
+ - Get started with Machine Learning Explore our all new and updated Front-End Web Developer Nanodegree Program. Enroll in the program to learn Front-end skills fr
+	 
+	May 5
+	
+	
+	
+	
+MakeMyTrip
+	
+Open ASAP! Summer Surprise Inside
+ - Grab 1 Free Night Stay on Hotels. Hurry! Rs.2000 FREE Mywallet Cash on New App Install. Download Now View T&Cs Follow us on: Click here to view our contact deta
+	 
+	May 5
+	
+	
+	
+	
+Sarabjit Kumar
+	
+Reminder to fill survey for Summer Training and Inputs during Summer PEP Classes
+ - Dear Students, Hope you all will be doing good in your examinations. This mail is a reminder to you all for filling your preference for Summer Training and Inpu
+	 
+	May 5
+	
+	
+	
+	
+Dr. Sunaina Ahuja
+	
+Seven-Day Workshop on Econometrics-Time Series & Panel Data Analysis
+ - Dear Ma'am/Sir, Greetings from Lovely Professional University - Human Resource Development Center! Data based decisions have acquired great significance in this
+Attachment
+Brochure-Workshop on Econometrics.pdf
+	
+	May 5
+	
+	
+	
+	
+Udemy Instructor: K.
+	
+Season 2 of Avanced framework development Selenium C#
+ - New Educational Announcement Hi Vivek, an announcement has been made from Karthik, instructor of Understanding Docker and using it for Selenium automation. Dear
+	 
+	May 5
+	
+	
+	
+	
+Facebook
+	
+Tony Nongrum and Sylvanus Lamare have birthdays today
+ - Help Tony Nongrum and Sylvanus Lamare celebrate their birthdays Saturday, May 5th Tony Nongrum Write on his timeline Sylvanus Lamare Write on his timeline Faceb
+	 
+	May 5
+	
+	
+	
+	
+Simplilearn
+	
+Thanks for your interest in Simplilearn’s DevOps certification training
+ - Welcome to Simplilearn Hi viveklp1995@gmail.com, Welcome and thank you for your interest in the Simplilearn DevOps Practitioner certification training program.
+	 
+	May 5
+	
+	
+	
+	
+Amazon.in
+	
+Amazon recommends "Algorithm Design Techniques:..." and more
+ - Your Amazon.in Today's Deals Get Amazon App Hello Vivek Singh, Here are personalized recommendations for you based on items you purchased or reviewed. Click her
+	 
+	May 5
+	
+	
+	
+	
+Udemy
+	
+Your Weekly Course Catalog is here. 15 fresh picks just for you.
+ - A weekly roundup of 15 courses picked just for you, straight to your inbox. Discover your next course. My Courses | Featured TFS Agile Planning Tools View Cours
+	 
+	May 4
+	
+	
+	
+	
+Twitter
+	
+Vivek, see 3 new updates from Randy Orton
+ - Updates you should see Updates for Randy Orton 1 Tweet 2 likes See all updates Settings | Help | Unsubscribe | Not my account We sent this email to @Hybriodomin
+	 
+	May 4
+	
+	
+	
+	
+alerts
+	
+You have paid Rs.90 to Daksh
+ - Money Sent Successfully ₹ 90 To Daksh's Paytm Wallet Linked to 9872853663 From VIVEK SINGH's Paytm Wallet Linked to 9473087056 May 4, 2018 20:54:38 Transaction
+	 
+	May 4
+	
+	
+	
+	
+Naukri Alerts
+	
+Job Openings for Analyst, Java Fresher, Developer
+ - PLC Programmer/engineer Keyskills: Written Communication, Communication Skills, Plc Programming, Plc - Scada Dear Vivek Singh You last updated your profile on 1
+	 
+	May 4
+	
+	
+	
+	
+Mark Manson
+	
+How to get motivated and take action
+ - Hey Mark here. One of the best habits I ever got into was writing consistently, and it's definitely paid off for me in the long run. But even though I've come t
+	 
+	May 4
+	
+	
+	
+	
+Udacity India
+	
+Make a career transition with the power of Python
+ - Most popular programming language in Machine learning world Beginner-friendly, versatile, and multi-library support have made Python one of the most powerful la
+	 
+	May 4
+	
+	
+	
+	
+Picubed
+	
+Eligible for projects
+ - Lovely Professional University Jalandhar-Delhi G.T. Road, NH-1, Near Chaheru Railway Bridge Hi Vivek Singh, You are eligible in 2 projects. project Details Proj
+	 
+	May 4
+	
+	
+	
+	
+Picubed
+	
+Eligible for job
+ - Lovely Professional University Jalandhar-Delhi G.T. Road, NH-1, Near Chaheru Railway Bridge Hey Vivek Singh, New job opportunity from iheal healthtech pvt limit
+	 
+	May 4
+	
+	
+	
+	
+Sarabjit Kumar
+	
+Reminder to fill survey for Summer Training and Inputs during Summer PEP Classes
+ - Dear Students, Hope you all will be doing good in your examinations. This mail is a reminder to you all for filling your preference for Summer Training and Inpu
+	 
+	May 4
+	
+	
+	
+	
+Mukesh Singh Rajput.
+	
+Mukesh Singh Rajput tagged you in a post on Facebook
+ - Mukesh Singh Rajput tagged you in a memory . You can choose if you want to add it to your timeline. Remember: Posts you hide from your timeline may still appear
+	 
+	May 4
+	
+	
+	
+	
+Amazon.in
+	
+Realme 1, Huawei P20 Lite, Nokia 7 plus & more new smartphones
+ - Latest in smartphones shop now Your Amazon.in Today's Deals Amazon App Offers on Smartphones Huawei P20 Lite Galaxy On7 Prime iPhone SE Vivo V9 Youth Smartphone
+	 
+	May 4
+	
+	
+	
+	
+Amazon.in
+	
+ACER A315-21-2109 NX.GNVSI.005 AMD...
+ - Your Amazon.in Today's Deals Get Amazon App Hello Vivek Singh, Are you looking for something in our Laptops store? If so, you might be interested in these items
+	 
+	May 4
+	
+	
+	
+	
+The Chef
+	
+CodeChef's May Challenge 2018
+ - View in browser 4th May 2018 CodeChef's May Challenge 2018 Hi Vivek Singh, Greetings from Chef! Each contest in Chefland is a new one to practice, perform and w
+	 
+	May 4
+	
+	
+	
+	
+MakeMyTrip
+	
+What's your Excuse to Travel This Summer?
+ - 4 Reasons to Book Your Summer Holiday Now. For web version, click here Here are our top trending destinations to help you decide: Download MakeMyTrip Mobile App
+	 
+	May 4
+	
+	
+	
+	
+Quincy Larson
+	
+How a 33-year-old museum tour guide became a professional web developer - her 18 month coding journey
+ - Here are this week's five links that are worth your time: 1. How a 33-year-old museum tour guide became a professional web developer - her 18 month coding journ
+	 
+	May 4
+	
+	
+	
+	
+Twitter
+	
+Vivek, see 3 new updates from Randy Orton
+ - Updates you should see Updates for Randy Orton 3 likes See all updates Settings | Help | Unsubscribe | Not my account We sent this email to @Hybriodominator Twi
+	 
+	May 4
+	
+	
+	
+	
+Saavn
+	
+All Your Music, All The Time
+ - Unlimited Downloads! With the power of unlimited downloads, you can listen offline no matter where you are. All you have to do is create a playlist, or pick fro
+	 
+	May 3
+	
+	
+	
+	
+HackerRank Team
+	
+Improve your Coding Skills with Java Exception Handling (Try-catch)
+ - Hi Vivek, Improve your skills with this challenge recommended for you: Java Exception Handling (Try-catch) Java | 28,569 submissions Use try-catch to test a blo
+	 
+	May 3
+	
+	
+	
+	
+Naukri.com Recruite.
+	
+Follow jobs of Datamatics recruiters
+ - Follow recruiters having relevant jobs for you Abhishek Saha Hr Manager Hiring for : 24 Online Info Technologies Private Limited Follow Send Message 277 Followe
+	 
+	May 3
+	
+	
+	
+	
+edX
+	
+⚡Enroll Now!⚡ Master new skills in 6 weeks or less.
+ - Discover exciting courses in Java, Virtual Reality, Entrepreneurial Mindset, Retail Fundamentals, and more! Sign Into Your Account Take your skills to the next
+	 
+	May 3
+	
+	
+	
+	
+Faraz, Draft 2
+	
+N queens
+ - Thanks a lot. Vivek Singh Red Hat Certified Professional | MCA(Hons) at Lovely Professional University P +91-8210012897 M +919473087056 E viveklp1995@gmail.com
+	 
+	May 3
+	
+	
+	
+	
+Udacity India
+	
+Become a Data Analyst: One of the hottest job roles of 2018!
+ - 59% of organizations claim an increase in the number of positions requiring data analysis skills. Data science: Most promising job area of 2018! According to a
+	 
+	May 3
+	
+	
+	
+	
+Paytm
+	
+You have paid Rs.50 to BHASHKAR YADAV
+ - Money Sent Successfully ₹ 50 To BHASHKAR YADAV's Paytm Wallet Linked to 9506377763 From VIVEK SINGH's Paytm Wallet Linked to 9473087056 May 3, 2018 18:47:42 Tra
+	 
+	May 3
+	
+	
+	
+	
+Udemy
+	
+Last chance at this week's top courses for only ₹770!
+ - It's our instructors that make Udemy what it is. Have you ever considered sharing your knowledge with millions of students worldwide? My Courses | Featured CHAN
+	 
+	May 3
+	
+	
+	
+	
+Picubed
+	
+Eligible for projects
+ - Lovely Professional University Jalandhar-Delhi G.T. Road, NH-1, Near Chaheru Railway Bridge Hi Vivek Singh, You are eligible in 2 projects. project Details Proj
+	 
+	May 3
+	
+	
+	
+	
+Amazon Web Services
+	
+AWSome Day Online Conference | Get Yourself Trained on AWS!
+ - Get Trained on AWS at AWSome Day Online Conference Join Amazon Web Services for AWSome Day Online Conference, a free, online training event that will provide yo
+	 
+	May 3
+	
+	
+	
+	
+Snapdeal
+	
+Last chance : 1-2-3 sale ends tonight
+ - 10% off using IndusInd bank cards. Daily Needs Store Daily Deals Smartwatches Recommended for you! lycan Home Gym 14 Kg Rubber Weight , D Rod , 3 Feet , Strate
+	 
+	May 3
+	
+	
+	
+	
+Coursera
+	
+Learn Skills That Get Results
+ - Real Skills, Real Results It’s never been easier to build your career with Coursera Reach your goals with flexible learning programs that fit your schedule.COUR
+	 
+	May 3
+	
+	
+	
+	
+Amazon.in
+	
+Turn your house into a home
+ - Home decor, furnishing, furniture and more. See more Your Amazon.in Today's Deals Amazon App Home decor to turn your house into a home Furnishing to reflect you
+	 
+	May 3
+	
+	
+	
+	
+Twitter
+	
+Top Tweets about Randy Orton
+ - Tweets about your top topics Randy Orton megan @megreyes_ So many of my former clients have been Day 1 when the Warriors played in the Cow Palace. I understand
+	 
+	May 3
+	
+	
+	
+	
+LinkedIn
+	
+Associate Engineer, SW at HARMAN International and 9 other jobs for you.
+ - Vivek Singh Top job picks for you Associate Engineer, SW HARMAN International · Bangalore, IN 1 alum Software Engineer (Java / Python / Ruby / Javascript / PHP
+	 
+	May 3
+	
+	
+	
+	
+Twitter
+	
+Vivek, see 8 new updates from Randy Orton
+ - Updates you should see Updates for Randy Orton 8 likes See all updates Settings | Help | Unsubscribe | Not my account We sent this email to @Hybriodominator Twi
+	 
+	May 2
+	
+	
+	
+	
+Sarabjit Kumar
+	
+Update in survey for MCA Summer Training 2018
+ - Dear Students, Two more options have been provided you for summer training to be held during June - July 2018. 1. Mean Stack Web Development (Online) 2. Manual
+	 
+	May 2
+	
+	
+	
+	
+MakeMyTrip
+	
+FREE Cancellation on Flights & Hotels!
+ - Enroll for MMTDOUBLEBLACK Now! Dear Customer, MMTDOUBLEBLACK is now available for Rs. 2,499 Rs. 1,499* only per year! Sign-up to be a part of this exclusive tra
+	 
+	May 2
+3.59 GB (23%) of 15 GB used
+Manage
+Terms - Privacy
+Last account activity: 0 minutes ago
+Details
+
+///////////////////////////////////////////////////////////////////////////passsing cursor as procedure arguments
+
+declare
+type cr is ref cursor;
+c1 cr;
+type rec is Record
+(
+name varchar2(20),
+sal integer
+);
+r rec;
+
+procedure p(c1 cr) is 
+begin
+loop
+fetch c1 into r;
+exit when c1%notfound;
+dbms_output.put_line(r.name || ' salary: '|| r.sal);
+end loop;
+end p;
+
+begin
+
+open c1 for select ename,sal from emp;
+
+p(c1);
+
+end;
+
+
+//////////////////////////////////////////////////////////////////////////Map - to compare two objects
+create or replace type tname as object
+(
+num number,
+map member function m1 return number
+);
+create or replace type body tname is 
+map member function m1 return number
+is 
+begin
+return num;
+end;
+end;
+declare
+n tname:=tname(10);
+n1 tname:=tname(20);
+begin
+if(n1>n) then 
+dbms_output.put_line('Greater');
+else
+dbms_output.put_line('Lesser');
+end if;
+end;
+
+
+//////////////////////////////////////////////////////////////////////////Index- Simple - Composite - Unique 
+create index index_name on table_name (col name);
+create index index_name on table_name(col1,col2);
+create unique
+
+
+
+/////////////////////////////////////////////////////////////////////////Abstract Class
+CREATE TYPE food_t AS OBJECT
+(
+   name VARCHAR2 (100),
+   food_group VARCHAR2 (100),
+   grown_in VARCHAR2 (100),
+   /* Generic foods cannot have a price, but we can
+      insist that all subtypes DO implement a price
+      function. */
+   NOT INSTANTIABLE MEMBER FUNCTION price RETURN NUMBER
+)
+   NOT FINAL NOT INSTANTIABLE;
+/
+
+CREATE TYPE dessert_t UNDER food_t (
+      contains_chocolate CHAR (1),
+      year_created NUMBER (4),
+      OVERRIDING MEMBER FUNCTION price RETURN NUMBER
+   )
+   NOT FINAL;
+/
+
+CREATE OR REPLACE TYPE BODY dessert_t
+IS
+   OVERRIDING MEMBER FUNCTION price RETURN NUMBER
+   IS
+      multiplier   NUMBER := 1;
+   BEGIN
+      DBMS_OUTPUT.put_line ('Dessert price!');
+
+      IF self.contains_chocolate = 'Y'
+      THEN
+         multiplier := 2;
+      END IF;
+
+      IF self.year_created < 1900
+      THEN
+         multiplier := multiplier + 0.5;
+      END IF;
+
+      RETURN (10.00 * multiplier);
+   END;
+END;
+/
+
+CREATE TYPE cake_t UNDER dessert_t (
+      diameter NUMBER,
+      inscription VARCHAR2 (200),
+      /* Inscription and diameter determine the price */
+      OVERRIDING MEMBER FUNCTION price RETURN NUMBER
+   );
+/
+
+CREATE OR REPLACE TYPE BODY cake_t
+IS
+   OVERRIDING MEMBER FUNCTION price
+      RETURN NUMBER
+   IS
+   BEGIN
+      DBMS_OUTPUT.put_line ('Cake price!');
+      RETURN (5.00 + 0.25 * (LENGTH (self.inscription)) + 0.50 * diameter);
+   END;
+END;
+/
+
+DECLARE
+   last_resort_dessert   dessert_t
+                            := dessert_t ('Jello',
+                                          'PROTEIN',
+                                          'bowl',
+                                          'N',
+                                          1887);
+   heavenly_cake         cake_t
+                            := cake_t ('Marzepan Delight',
+                                       'CARBOHYDRATE',
+                                       'bakery',
+                                       'N',
+                                       1634,
+                                       8,
+                                       'Happy Birthday!');
+BEGIN
+   DBMS_OUTPUT.put_line (last_resort_dessert.price);
+   DBMS_OUTPUT.put_line (heavenly_cake.price);
+END;
+/
+
+/* Demonstration of dynamic polymorphism */
+
+DECLARE
+   TYPE foodstuffs_nt IS TABLE OF food_t;
+
+   fridge_contents   foodstuffs_nt
+                        := foodstuffs_nt (dessert_t ('Strawberries and cream',
+                                                     'FRUIT',
+                                                     'Backyard',
+                                                     'N',
+                                                     2001),
+                                          cake_t ('Chocolate Supreme',
+                                                  'CARBOHYDATE',
+                                                  'Kitchen',
+                                                  'Y',
+                                                  2001,
+                                                  8,
+                                                  'Happy Birthday, Veva'));
+BEGIN
+   FOR indx IN fridge_contents.FIRST .. fridge_contents.LAST
+   LOOP
+      DBMS_OUTPUT.put_line (
+            'Price of '
+         || fridge_contents (indx).name
+         || ' = '
+         || fridge_contents (indx).price);
+   END LOOP;
+END;
+
+
+
+
+
+create or replace type square is object
+(
+ l number,
+not instantiable not final member function area return number
+)not instantiable not final;
+
+
+create or replace type rec under square 
+(
+b number,
+member function area2 return number
+);
+
+create or replace type body rectangle as 
+member function area1 return number
+is
+begin
+return (l*b);
+end;
+member function area2 return number
+is
+begin
+return (l*b);
+end;
+end;
+
+
+declare
+p rectangle:=rectangle(6,10);
+begin
+dbms_output.put_line('Area '||p.area||' '||'Perimeter '||p.area2);
+end;
+
+
+
+
+/////////////////////////////////////////////////////////////////////////order method - for comapring varchar 
+create or replace type t1 as object
+(
+name varchar(10),
+order Member function cmp(t t1) return number);
+
+create or replace type body t1 as
+order member function cmp(t t1) return number is
+begin 
+if(name > t.name) then
+return 1;
+else 
+if (name < t.name) then
+return 1;
+
+else 
+return 0;
+end if;
+end if;
+end;
+end;
+
+declare 
+s t1;
+s1 t1;
+
+r number;
+
+begin
+s:= new t1('abvc');
+s1:= new t1('adsa');
+
+dbms_output.put_line(s.cmp(s1));
+end;
+
+/////////////////////////////////////////////////////////////////////////order method -used to compare two objects
+create or replace type t1 as object
+(
+cgpa number,
+order Member function cmp(t t1) return number);
+
+create or replace type body t1 as
+order member function cmp(t t1) return number is
+begin 
+if(cgpa > t.cgpa) then
+return 1;
+else 
+if (cgpa < t.cgpa) then
+return 1;
+
+else 
+return 0;
+end if;
+end if;
+end;
+end;
+
+declare 
+s t1;
+s1 t1;
+
+r number;
+
+begin
+s:= new t1(9);
+s1:= new t1(8);
+
+dbms_output.put_line(s.cmp(s1));
+end;
+
+harjinder.12962
+
+//////////////////////////////////////////////////////////////////////////constructor 
+
+create or replace type o as object( 
+   rollno number,
+   name varchar(10),
+   constructor function o(R in number , n in number) return self as result);
+
+create or replace type body o as
+
+        constructor function o(rollno in number, name in varchar) return self as result
+        is begin
+        self.rollno := rollno;
+        self.name := name;
+        return;
+        end;
+end;
+
+declare
+o1 o:= new o(21,'Ranjikanth');
+begin
+dbms_output.put_line(o1.rollno ||' '|| o1.name);
+end;
+
+//////////////////////////////////////////////////////////////////////////
+MISSED DURING THE DP
+
+
+declare
+id number;
+name varchar(10);
+age number;
+create or replace type result as object( grade character(1),CGPA number);
+begin
+
+
+end;
+====================================================================
+//return name using id pass through function
+declare
+
+id number:=:emp_id;
+nam emp.ename%type;
+	FUNCTION display(id number) RETURN varchar is n varchar(10);
+	BEGIN
+		select ename into n from emp where empno = id;
+		return n;
+	END;
+begin
+   nam:=display(id);
+   dbms_output.put_line(nam);
+end;
+
+
+========================================================================
+
+//return data using object through function by procedure
+
+  
+create or replace type o1 as object( rollno number, name varchar(10), member function f1 return number,member function f2 return varchar);
+
+create or replace type body o1 as
+	member function f1 return number is
+	begin
+	 return rollno;
+	end;
+	member function f2 return varchar is
+	begin
+	 return name;
+	end;
+end;
+
+declare
+o o1:=:o1(21,'Rajnikant');
+begin
+dbms_output.put_line(o.f1 || o.f2);
+end;
+
+========================================
+
+//function overloading
+
+create or replace type o1 as object( 
+   rollno number,
+   name varchar(10),
+   member function f1(a number) return number,
+   member function f1(b varchar) return varchar);
+
+create or replace type body o1 as
+	member function f1(a number) return number is
+	begin
+	 return rollno;
+	end;
+	member function f1(b varchar) return varchar is
+	begin
+	 return name;
+	end;
+end;
+
+declare
+o o1:=o1(21,'Rajnikant');
+begin
+dbms_output.put_line(o.f1(21) || o.f1('gaurav'));
+end;
+
+--------------------------------------------
+declare
+num1 number:=:n1;
+num2 number:=:n2;
+num3 number:=:n3;
+largest number;
+function large(num1 IN number,num2 IN number) return number is
+l number;
+	begin
+	if(num1>num2)then
+		return num1;
+	else
+		return num2;
+	end if;
+end;
+
+function large(num1 IN number,num2 IN number,num3 IN number) return number is
+	begin
+	if(num1>num2 AND num1>num3)then
+		return num1;
+	else if(num2>num1 AND num2>num3) then
+		return num2;
+	else
+		return num3;
+	end if;
+end if;
+end;
+
+begin
+largest:=large(2,3);
+DBMS_output.put_line(largest);
+largest:=large(3,4,1);
+DBMS_output.put_line(largest);
+end;
+
+
+--------------======================================================
+
+//inheritance
+
+  
+create or replace type o1 as object( rollno number, member function f1 return number)not final;
+create or replace type body o1 as
+	member function f1(a number) return number is
+	begin
+	 return rollno;
+	end;
+end;
+
+create or replace type o2 as object under o1(  name varchar(10), member function f2 return varchar);
+create or replace type body o1 as
+	member function f2(a varchar) return number is
+	begin
+	 return name;
+	end;
+end;
+
+
+
+///////////////////////////////////////////////////////////////////////////Function for smalllest num
+
+declare
+num1 number:=:n1;
+num2 number:=:n2;
+num number;
+
+function smallest(num1 in number, num2 in number) return number
+is
+s number;
+
+begin
+
+if num1<num2 then
+s:=num1;
+else
+s:=num2;
+end if;
+
+return s;
+end;
+
+begin
+
+num:=smallest(num1,num2);
+
+dbms_output.put_line(num);
+end;
+
+
+///////////////////////////////////////////////////////////////////////////Objects
+create or replace type obj as object(
+name varchar(10), rollno number, class varchar(4), city varchar(10));
+
+Declare
+
+o obj;
+
+Begin
+
+o:=obj('Ashwini',1,'MCA','Surat');
+
+dbms_output.put_line(o.name ||' ' || o.rollno || ' '|| o.class ||' '|| o.city);
+end;
+
+create or replace type obj as object(var1 number , member procedure display);
+create or replace type body obj
+is 
+member procedure display is
+begin
+dbms_output.put_line(var1);
+end;
+end;
+
+declare
+o obj := obj(:v);
+begin
+o.display;
+end;
+
+create or replace type obj as object(var1 number , var2 number, member procedure display);
+
+create or replace type body obj
+is 
+member procedure display is
+begin
+if var1 > var2 then
+dbms_output.put_line(var1);
+else
+dbms_output.put_line(var2);
+end if;
+end;
+end;
+
+declare
+o obj := obj(:v,:v1);
+begin
+o.display;
+end;
+
+create or replace type obj as object(var1 number , var2 varchar(10), member procedure display);
+
+
+create or replace type body obj
+is 
+member procedure display is
+begin
+dbms_output.put_line(var1||var2);
+end;
+end;
+
+declare
+o obj := obj(:v,:v1);
+begin
+o.display;
+end;
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////// take 2 array - compare the elements of both array 
+DECLARE 
+  
+   type arraynum IS VARRAY(5) OF number; 
+   num arraynum; 
+   num2 arraynum;
+   i number;
+   flag number:=0;
+   
+BEGIN 
+
+num:= arraynum(98, 97, 78, 87, 92); 
+num2:= arraynum(98,97,78,87,92);
+
+i:=1;
+for i in 1..num.last loop
+
+if(num(i) !=num2(i)) then
+flag:=1;
+end if;
+
+end loop;
+
+if flag =0 then
+dbms_output.put_line('Equal');
+else
+dbms_output.put_line('Not Equal');
+end if;
+end;
+
+
+
+/////////////////////////////////////////////////////////////////////////////pass first or last name -show corresponding name
+
+Declare
+rec demo_customers%rowtype;
+
+cursor c1(i varchar) is select * from demo_customers where cust_first_name like i or cust_last_name like i;
+
+begin
+
+open c1('Edward%');
+loop
+
+fetch c1 into rec;
+
+exit when c1%notfound;
+
+dbms_output.put_line(rec.cust_first_name ||' ' || rec.cust_last_name);
+
+end loop;
+close c1;
+
+end;
+
+
+
+/////////////////////////////////////////////////////////////////////////////Parameterized Cursor
+Declare
+cursor c1(i  number, j number) is select ename from emp where job = i ;
+num varchar(10);
+begin
+
+open c1('MANAGER');
+loop
+fetch c1 into num;
+exit when c1%notfound;
+dbms_output.put_line(num);
+end loop;
+close c1;
+end;
+
+
+Declare
+cursor c1(i number) is select sum(sal) from emp where empno > i;
+num number;
+begin
+
+open c1(7800);
+
+fetch c1 into num;
+
+dbms_output.put_line(num);
+
+close c1;
+end;
+
+Declare
+cursor c1(i varchar) is select sum(sal) from emp where job = i ;
+num number;
+begin
+
+open c1('MANAGER');
+
+fetch c1 into num;
+
+dbms_output.put_line(num);
+
+close c1;
+end;
+
+
+
+
+////////////////////////////////////////////////////////////////////////////Arrange data according to hire date using subtype
+declare
+Subtype s1 is varchar(20);
+Subtype t1 is integer;
+
+cursor c1 is select ename,(round(sysdate - hiredate)) from emp order by (round(sysdate - hiredate)) desc;
+
+s s1;
+t t1; 
+begin
+open c1;
+loop
+fetch c1 into s,t;
+
+exit when c1%notfound;
+ dbms_output.put_line(s||' has experience of '||t);
+
+end loop;
+end;
+
+
+Declare
+cursor c1(i varchar) is select ename from emp where job = i ;
+num varchar(10);
+begin
+
+open c1('MANAGER');
+loop
+fetch c1 into num;
+exit when c1%notfound;
+dbms_output.put_line(num);
+end loop;
+close c1;
+end;
+
+
+
+////////////////////////////////////////////////////////////////////////////Second highest & top three 
+declare
+salary emp.sal%type;
+cursor c1 is select distinct sal from emp order by sal desc;
+
+begin
+open c1;
+loop
+fetch c1 into salary;
+
+exit when c1%rowcount=3;
+if( c1%rowcount=1) then
+dbms_output.put_line('Second Highest :');
+else
+dbms_output.put_line(salary);
+end if;
+
+end loop;
+end;
+
+
+///////////////////////////////////////////////////////////////////////////////using subtype calculate total year of experience
+
+
+
+////////////////////////////////////////////////////////////////////////////Android Eval wale din ka
+how tp pass ref_cursor as procedure arguments.
+
+Procedue:::
+declare
+type cr is ref cursor;
+c1 cr;
+type rect is Record
+(
+name varchar2(20),
+age integer
+);
+r rect;
+procedure p(c1 cr) is 
+begin
+loop
+fetch c1 into r;
+exit when c1%notfound;
+dbms_output.put_line(r.name);
+end loop;
+end p;
+begin
+loop
+open c1 for select name,roll from t1 where rollno>3;
+exit when c1%notfound;
+p1(c1);
+end loop;
+end;
+
+
+Subtype
+::
+
+declare 
+subtype s1 is varchar(20);
+subtype t is integer;
+name s1;
+t1 t;
+begin
+name:='&n';
+t1:='&t1';
+dbms_output.put_line(name||t1);
+end;
+
+
+declare
+subtype s1 is varchar(20) NOT NULL;
+subtype t is varchar(20);
+s s1;
+x t;
+begin
+s:='&a';
+x:='&b';
+s:=x;
+dbms_output.put_line(s||x);
+end;
+/////////////////////////////////////////////////////////////////////////////Subtype
+Declare
+Subtype s1 is varchar(20);
+Subtype t is integer;
+
+name s1;
+
+t1 t;
+
+begin
+
+name:=:n;
+t1 :=:t;
+
+dbms_output.put_line(name||t1);
+end;
+
+///Passing ref cursor as procedure arg
+
+
+
+///////////////////////////////////////////////////////////////////////Reverse of a Number using procedure
+
+
+///////////////////////////////////////////////////////////////////////String Functions 
+upper(String)
+lower(String)
+initcap(String) - First letter capital
+reverse()
+length() 
+replace(String, Character 1, Character 2)
+substr(String, Starting position, ending position)
+lpad(String, length, char)
+rpad(String, Length, Char)
+ltrim(String)
+rtrim(String)
+concat(String1, String2)
+
+///////////////////////////////////////////////////////////////////////Fetch data from table & display the names of those having first letter capital
+declare
+type collec is ref cursor return demo_customers%rowtype;
+n collec;
+
+n1 demo_customers%rowtype;
+
+begin
+
+open n for select * from demo_customers where ascii(substr(cust_first_name,1,1)) >= 65 and ascii(substr(cust_first_name,1,1)) <= 90 ;
+
+loop
+
+fetch n into n1;
+
+exit when n%notfound;
+
+dbms_output.put_line(n1.cust_first_name);
+end loop;
+end;
+
+////////////////////////////////////////////////////////////////////////Sorting of Array Elements
+DECLARE 
+  
+   type arraynum IS VARRAY(5) OF number; 
+   num arraynum; 
+   m number; 
+   total number;
+BEGIN 
+   
+   num:= arraynum(98, 97, 78, 87, 92); 
+ 
+
+   FOR i in 1 .. 5 LOOP 
+       For j in 1 .. 4 loop
+        if (num(j)>num(j+1)) then
+           m:= num(j);
+          num(j):=num(j+1);
+           num(j+1):= m;
+      end if;
+    End Loop;
+   END LOOP;
+
+for i in 1 .. 5 loop
+dbms_output.put_line(num(i));
+end loop; 
+END;
+
+////////////////////////////////////////////////////////////////////////name starting from k check if name is in small letter convert into small 
+
+
+//////////////////////////////////////////////////////////////////// ref cursor - weak with record
+
+declare
+
+type rcr is ref cursor;
+cm rcr;
+type rcrd is record (
+cust_first_name varchar2(20), credit_limit number(6));
+
+er rcrd;
+
+begin
+
+open cm for select cust_first_name, credit_limit from demo_customers;
+
+loop
+
+fetch cm into er;
+
+exit when cm%notfound;
+dbms_output.put_line(er.cust_first_name || ' has a limit of ' || er.credit_limit);
+
+end loop;
+end;
+
+
+/////////////////////////////////////////////////////////////////////user defined ref cursor - strong ( returns a value & can only be used to fetch data from a single table)
+
+declare
+type collec is ref cursor return demo_customers%rowtype;
+n collec;
+
+n1 demo_customers%rowtype;
+
+begin
+
+open n for select * from demo_customers;
+
+loop
+
+fetch n into n1;
+
+exit when n%notfound;
+
+dbms_output.put_line(n1.cust_first_name);
+end loop;
+end;
+				
+
+/////////////////////////////////////////////////////////////////////user defined ref cursor - weak (doesnt return any value)
+
+****strong ref - can only fetch data from one table****
+
+declare
+type n is ref cursor;
+n1 n;
+t1 test%rowtype;
+t2 demo_customers%rowtype;
+
+begin
+
+open n1 for  select * from test;
+
+loop
+fetch n1 into t1;
+
+exit when n1%notfound;
+
+dbms_output.put_line(t1.info);
+
+exit when n1%notfound;
+
+end loop;
+
+open n1 for select * from demo_customers;
+loop
+fetch n1 into t2;
+
+exit when n1%notfound;
+
+dbms_output.put_line(t2.cust_first_name);
+
+end loop;
+
+end;
+
+
+
+//////////////////////////////////////////////////////////////////using collection count number of odd and even
+
+
+//////////////////////////////////////////////////////////////////Cursor using for loop
+declare
+
+name demo_customers.cust_first_name%type;
+credit demo_customers.credit_limit%type;
+
+cursor c1 is select cust_first_name, credit_limit from demo_customers;
+
+begin
+open c1;
+loop
+fetch c1 into name, credit;
+
+exit when c1%notfound;
+
+dbms_output.put_line(name || ' has  a limit of '||credit);
+end loop;
+end;
+
+
+//////////////////////////////////////////////////////////////////Reference Cursor - Points to memory address
+Reference cannot be used with for loop
+
+declare
+ cursor c1 is select cust_first_name, credit_limit from demo_customers;
+
+begin
+
+--open c1;
+
+for i in c1 loop
+
+dbms_output.put_line(i.cust_first_name || ' Has limit of '|| i.credit_limit);
+
+end loop;
+ end;
+
+
+
+declare
+ c1 sys_refcursor;
+name varchar(20);
+credit number(5);
+ 
+
+begin
+open c1 for select cust_first_name , credit_limit from demo_customers;
+
+loop
+fetch c1 into name, credit;
+exit when c1%notfound;
+dbms_output.put_line(name || ' Has limit of '|| credit);
+
+end loop;
+ end;
+
+//////////////////////////////////////////////////////////////////Using cursor to find odd/even
+
+declare
+cursor c1 is select cust_postal_code from demo_customers;
+num integer :=0;
+even integer :=0;
+odd integer :=0;
+
+begin
+
+OPEN c1;
+
+LOOP
+      FETCH c1 INTO num;
+      EXIT WHEN c1%NOTFOUND;
+      if mod(num,2)=0 then
+      dbms_output.put_line(num || ' is Even');
+      even:= even+1;
+      else
+      dbms_output.put_line(num || ' is Odd');
+      odd:= odd+1;
+     end if;
+   END LOOP;
+
+dbms_output.put_line('Odd :' || odd ||' Even:' || even);
+end;
+ 
+
+
+
+
+/////////////////////////////////////////////////////////////Passing record to a procedure 
+declare
+type r1 is record
+(id number,
+name varchar2(20),
+city varchar2(25));
+r r1;
+procedure print(s in out r1) is
+begin
+dbms_output.put_line(s.id || s.name);
+end print;
+
+
+begin
+r.id:=1; r.name:='abc';
+print(r);
+end;
+
+
+////////////////////////////////////////////////////////////creating procedure
+DECLARE 
+   a number; 
+   b number; 
+   c number;
+PROCEDURE add(x IN number, y IN number, z OUT number) IS 
+BEGIN 
+  z:=x+y;
+dbms_output.put_line(z);
+END;   
+BEGIN 
+   a:= 23; 
+   b:= 45; 
+   add(a, b, c); 
+ 
+END; 
+
+//////////////////////////////////////////////////////////////// user defined record	
+declare
+type r1 is record
+(id number,
+name varchar2(20),
+city varchar2(25));
+
+r r1;
+
+begin
+r.id:=1; r.name:='abc';
+dbms_output.put_line(r.id || r.name);
+end;
+////////////////////////////////////////////////////////////////record using cursor
+declare
+rec demo_customers%rowtype;
+cursor c1 is select * from demo_customers where cust_state like '%A';
+begin
+open c1;
+loop
+	
+exit when c1%notfound; 
+
+dbms_output.put_line(rec.cust_first_name ||' State: '|| rec.cust_city);
+end loop;
+close c1;
+end;
+//////////////////////////////////////////////////////////////using table record
+declare
+rec demo_customers%rowtype;
+begin
+select * into rec from demo_customers where cust_state like 'N%';
+
+dbms_output.put_line(rec.cust_first_name ||' State: '|| rec.cust_city);
+end;
+
+//////////////////////////////////////////////////////////////%rowtype
+
+declare
+rec demo_customers%rowtype;
+cursor c1 is select * from demo_customers where credit_limit = '1000';
+begin
+open c1;
+loop
+fetch c1 into rec;
+exit when c1%notfound;
+dbms_output.put_line(rec.Cust_city);
+end loop;
+close c1;
+end;
+/////////////////////////////////////////////////////////////// LOOP
+
+DECLARE 
+   i number(1); 
+   j number(1); 
+BEGIN 
+   << outer_loop >> 
+   FOR i IN 1..3 LOOP 
+      << inner_loop >> 
+      FOR j IN 1..3 LOOP 
+         dbms_output.put_line('i is: '|| i || ' and j is: ' || j); 
+      END loop inner_loop; 
+   END loop outer_loop; 
+END; 
+
+////////////////////////////////////////////////////////////// varray
+
+DECLARE 
+   type namesarray IS VARRAY(5) OF VARCHAR2(10); 
+   type grades IS VARRAY(5) OF INTEGER; 
+   names namesarray; 
+   marks grades; 
+   total integer; 
+BEGIN 
+   names := namesarray('Kavita', 'Pritam', 'Ayan', 'Rishav', 'Aziz'); 
+   marks:= grades(98, 97, 78, 87, 92); 
+   total := names.count; 
+   dbms_output.put_line('Total '|| total || ' Students'); 
+   FOR i in 1 .. total LOOP 
+      dbms_output.put_line('Student: ' || names(i) || ' 
+      Marks: ' || marks(i)); 
+   END LOOP; 
+END;
+////////////////////////////////////////////////////////////////////// VARRAY with type
+DECLARE 
+   CURSOR c_customers is 
+   SELECT  name FROM customers; 
+   type c_list is varray (6) of customers.name%type; 
+   name_list c_list := c_list(); 
+   counter integer :=0; 
+BEGIN 
+   FOR n IN c_customers LOOP 
+      counter := counter + 1; 
+      name_list.extend; 
+      name_list(counter)  := n.name; 
+      dbms_output.put_line('Customer('||counter ||'):'||name_list(counter)); 
+   END LOOP; 
+END; 
+/////////////////////////////////////////////////////////////////////// Associative Array
+DECLARE
+  TYPE population_type IS TABLE OF NUMBER INDEX BY VARCHAR2(64);
+  country_population population_type;
+  continent_population population_type;
+  howmany NUMBER;
+  which VARCHAR2(64)
+
+BEGIN
+  country_population('Greenland') := 100000;
+  country_population('Iceland') := 750000;
+  howmany := country_population('Greenland');
+
+  continent_population('Australia') := 30000000;
+  continent_population('Antarctica') := 1000; -- Creates new entry
+  continent_population('Antarctica') := 1001; -- Replaces previous 
+value
+  which := continent_population.FIRST; -- Returns 'Antarctica'
+-- as that comes first alphabetically.
+  which := continent_population.LAST; -- Returns 'Australia'
+  howmany := continent_population(continent_population.LAST);
+-- Returns the value corresponding to the last key, in this
+-- case the population of Australia.
+END;
+///////////////////////////////////////////////////////////////// Table using rowtype
+
+DECLARE
+   TYPE EmpTabTyp IS TABLE OF emp%ROWTYPE
+      INDEX BY BINARY_INTEGER;
+   emp_tab EmpTabTyp;
+BEGIN
+   /* Retrieve employee record. */
+   SELECT * INTO emp_tab(7468) FROM emp WHERE empno = 7468;
+END;
+
+//////////////////////////////////////////////////////////////// Associative Array
+
+
+DECLARE 
+   TYPE salary IS TABLE OF NUMBER INDEX BY VARCHAR2(20); 
+   salary_list salary; 
+   name   VARCHAR2(20); 
+BEGIN 
+   -- adding elements to the table 
+   salary_list('Rajnish') := 62000; 
+   salary_list('Minakshi') := 75000; 
+   salary_list('Martin') := 100000; 
+   salary_list('James') := 78000;  
+   
+   -- printing the table 
+   name := salary_list.FIRST; 
+   WHILE name IS NOT null LOOP 
+      dbms_output.put_line 
+      ('Salary of ' || name || ' is ' || TO_CHAR(salary_list(name))); 
+      name := salary_list.NEXT(name); 
+   END LOOP; 
+END; 
+///////////////////////////////////////////////////////////////// Table
+
+DECLARE 
+   CURSOR c_customers is 
+      select name from customers; 
+
+   TYPE c_list IS TABLE of customers.Name%type INDEX BY binary_integer; 
+   name_list c_list; 
+   counter integer :=0; 
+BEGIN 
+   FOR n IN c_customers LOOP 
+      counter := counter +1; 
+      name_list(counter) := n.name; 
+      dbms_output.put_line('Customer('||counter||'):'||name_lis t(counter)); 
+   END LOOP; 
+END; 
+
+//////////////////////////////////////////////////////////////// Nested Table
+
+DECLARE 
+   TYPE names_table IS TABLE OF VARCHAR2(10); 
+   TYPE grades IS TABLE OF INTEGER;  
+   names names_table; 
+   marks grades; 
+   total integer; 
+BEGIN 
+   names := names_table('Kavita', 'Pritam', 'Ayan', 'Rishav', 'Aziz'); 
+   marks:= grades(98, 97, 78, 87, 92); 
+   total := names.count; 
+   dbms_output.put_line('Total '|| total || ' Students'); 
+   FOR i IN 1 .. total LOOP 
+      dbms_output.put_line('Student:'||names(i)||', Marks:' || marks(i)); 
+   end loop; 
+END; 
+
+
+DECLARE 
+   CURSOR c_customers is  
+      SELECT  name FROM customers;  
+   TYPE c_list IS TABLE of customerS.No.ame%type; 
+   name_list c_list := c_list(); 
+   counter integer :=0; 
+BEGIN 
+   FOR n IN c_customers LOOP 
+      counter := counter +1; 
+      name_list.extend; 
+      name_list(counter)  := n.name; 
+      dbms_output.put_line('Customer('||counter||'):'||name_list(counter)); 
+   END LOOP; 
+END; 
+/////////////////////////////////////////////////////////////
+
+
+assoc array
+v array
+simple
+array
+
+usiing cursor
+v array
+nested table
+
+pl sql.txt
+Displaying pl sql.txt.
+
+
+
+
+
+
+Skip to content
+Using Gmail with screen readers
+Conversations
+	
+	
+	
+	
+edX
+	
+🤗 15 trending courses. Find yours today!
+ - Discover exciting courses in Marketing Analytics, Project Management, Animal Ethics and more! Sign Into Your Account What do you want to learn? Explore exciting
+	 
+	9:04 PM
+	
+	
+	
+	
+Faraz Hussain
+	
+Fwd: plsql programs
+ - ---------- Forwarded message --------- From: Faraz Hussain <faraaz786husain@gmail.com> Date: Sat, May 5, 2018, 23:09 Subject: plsql programs To: <geetanjalia1995@gmail.com>
+Attachments
+pl sql.txt
+plsql ques.txt
+plsql.txt
+	
+	7:27 PM
+	
+	
+	
+	
+Freeletics
+	
+Hypertrophy: It is time to go big!
+ - When it comes to muscle, size matters. Let’s be honest, who doesn’t like to see the results of their hard work in the mirror? But did you know that hypertrophy,
+	 
+	3:50 PM
+	
+	
+	
+	
+Amazon.in
+	
+Amazon recommends "Elove® Dual Port USB Charger..." and more
+ - Your Amazon.in Today's Deals Get Amazon App Hello Vivek Singh, Here are personalized recommendations for you based on items you purchased or reviewed. Click her
+	 
+	5:50 AM
+	
+	
+	
+	
+Mark Manson
+	
+How self-aware are you?
+ - Hey, Mark here. What do a 16th-century Indian guru, Facebook addiction, spoon castration and bad sexual metaphors all have in common? That's right: another Mark
+	 
+	1:51 AM
+	
+	
+	
+	
+mail
+	
+You are invited to join Examly
+ - Hi Examly user, Welcome to Examly! Please set your password and activate your account by clicking the below link: Activate Account Regards, Team Examly
+	 
+	12:42 AM
+	
+	
+	
+	
+mail
+	
+You have been enrolled in a course
+ - Hi Examly user, You have been newly enrolled in the following course: Informatica Mock Test Regards, Team Examly
+	 
+	12:42 AM
+	
+	
+	
+	
+Ministry of Railway.
+	
+Get Your Meals Delivered to Your Berth
+ - Having trouble reading this email? View in your Mobile/Web browser /PiyushGoyalOfficial @PiyushGoyal www.piyushgoyal.in /RailMinIndia
+	 
+	May 5
+	
+	
+	
+	
+Udacity India
+	
+All New Front-end Nanodegree Program - Explore Now
+ - Get started with Machine Learning Explore our all new and updated Front-End Web Developer Nanodegree Program. Enroll in the program to learn Front-end skills fr
+	 
+	May 5
+	
+	
+	
+	
+MakeMyTrip
+	
+Open ASAP! Summer Surprise Inside
+ - Grab 1 Free Night Stay on Hotels. Hurry! Rs.2000 FREE Mywallet Cash on New App Install. Download Now View T&Cs Follow us on: Click here to view our contact deta
+	 
+	May 5
+	
+	
+	
+	
+Sarabjit Kumar
+	
+Reminder to fill survey for Summer Training and Inputs during Summer PEP Classes
+ - Dear Students, Hope you all will be doing good in your examinations. This mail is a reminder to you all for filling your preference for Summer Training and Inpu
+	 
+	May 5
+	
+	
+	
+	
+Dr. Sunaina Ahuja
+	
+Seven-Day Workshop on Econometrics-Time Series & Panel Data Analysis
+ - Dear Ma'am/Sir, Greetings from Lovely Professional University - Human Resource Development Center! Data based decisions have acquired great significance in this
+Attachment
+Brochure-Workshop on Econometrics.pdf
+	
+	May 5
+	
+	
+	
+	
+Udemy Instructor: K.
+	
+Season 2 of Avanced framework development Selenium C#
+ - New Educational Announcement Hi Vivek, an announcement has been made from Karthik, instructor of Understanding Docker and using it for Selenium automation. Dear
+	 
+	May 5
+	
+	
+	
+	
+Facebook
+	
+Tony Nongrum and Sylvanus Lamare have birthdays today
+ - Help Tony Nongrum and Sylvanus Lamare celebrate their birthdays Saturday, May 5th Tony Nongrum Write on his timeline Sylvanus Lamare Write on his timeline Faceb
+	 
+	May 5
+	
+	
+	
+	
+Simplilearn
+	
+Thanks for your interest in Simplilearn’s DevOps certification training
+ - Welcome to Simplilearn Hi viveklp1995@gmail.com, Welcome and thank you for your interest in the Simplilearn DevOps Practitioner certification training program.
+	 
+	May 5
+	
+	
+	
+	
+Amazon.in
+	
+Amazon recommends "Algorithm Design Techniques:..." and more
+ - Your Amazon.in Today's Deals Get Amazon App Hello Vivek Singh, Here are personalized recommendations for you based on items you purchased or reviewed. Click her
+	 
+	May 5
+	
+	
+	
+	
+Udemy
+	
+Your Weekly Course Catalog is here. 15 fresh picks just for you.
+ - A weekly roundup of 15 courses picked just for you, straight to your inbox. Discover your next course. My Courses | Featured TFS Agile Planning Tools View Cours
+	 
+	May 4
+	
+	
+	
+	
+Twitter
+	
+Vivek, see 3 new updates from Randy Orton
+ - Updates you should see Updates for Randy Orton 1 Tweet 2 likes See all updates Settings | Help | Unsubscribe | Not my account We sent this email to @Hybriodomin
+	 
+	May 4
+	
+	
+	
+	
+alerts
+	
+You have paid Rs.90 to Daksh
+ - Money Sent Successfully ₹ 90 To Daksh's Paytm Wallet Linked to 9872853663 From VIVEK SINGH's Paytm Wallet Linked to 9473087056 May 4, 2018 20:54:38 Transaction
+	 
+	May 4
+	
+	
+	
+	
+Naukri Alerts
+	
+Job Openings for Analyst, Java Fresher, Developer
+ - PLC Programmer/engineer Keyskills: Written Communication, Communication Skills, Plc Programming, Plc - Scada Dear Vivek Singh You last updated your profile on 1
+	 
+	May 4
+	
+	
+	
+	
+Mark Manson
+	
+How to get motivated and take action
+ - Hey Mark here. One of the best habits I ever got into was writing consistently, and it's definitely paid off for me in the long run. But even though I've come t
+	 
+	May 4
+	
+	
+	
+	
+Udacity India
+	
+Make a career transition with the power of Python
+ - Most popular programming language in Machine learning world Beginner-friendly, versatile, and multi-library support have made Python one of the most powerful la
+	 
+	May 4
+	
+	
+	
+	
+Picubed
+	
+Eligible for projects
+ - Lovely Professional University Jalandhar-Delhi G.T. Road, NH-1, Near Chaheru Railway Bridge Hi Vivek Singh, You are eligible in 2 projects. project Details Proj
+	 
+	May 4
+	
+	
+	
+	
+Picubed
+	
+Eligible for job
+ - Lovely Professional University Jalandhar-Delhi G.T. Road, NH-1, Near Chaheru Railway Bridge Hey Vivek Singh, New job opportunity from iheal healthtech pvt limit
+	 
+	May 4
+	
+	
+	
+	
+Sarabjit Kumar
+	
+Reminder to fill survey for Summer Training and Inputs during Summer PEP Classes
+ - Dear Students, Hope you all will be doing good in your examinations. This mail is a reminder to you all for filling your preference for Summer Training and Inpu
+	 
+	May 4
+	
+	
+	
+	
+Mukesh Singh Rajput.
+	
+Mukesh Singh Rajput tagged you in a post on Facebook
+ - Mukesh Singh Rajput tagged you in a memory . You can choose if you want to add it to your timeline. Remember: Posts you hide from your timeline may still appear
+	 
+	May 4
+	
+	
+	
+	
+Amazon.in
+	
+Realme 1, Huawei P20 Lite, Nokia 7 plus & more new smartphones
+ - Latest in smartphones shop now Your Amazon.in Today's Deals Amazon App Offers on Smartphones Huawei P20 Lite Galaxy On7 Prime iPhone SE Vivo V9 Youth Smartphone
+	 
+	May 4
+	
+	
+	
+	
+Amazon.in
+	
+ACER A315-21-2109 NX.GNVSI.005 AMD...
+ - Your Amazon.in Today's Deals Get Amazon App Hello Vivek Singh, Are you looking for something in our Laptops store? If so, you might be interested in these items
+	 
+	May 4
+	
+	
+	
+	
+The Chef
+	
+CodeChef's May Challenge 2018
+ - View in browser 4th May 2018 CodeChef's May Challenge 2018 Hi Vivek Singh, Greetings from Chef! Each contest in Chefland is a new one to practice, perform and w
+	 
+	May 4
+	
+	
+	
+	
+MakeMyTrip
+	
+What's your Excuse to Travel This Summer?
+ - 4 Reasons to Book Your Summer Holiday Now. For web version, click here Here are our top trending destinations to help you decide: Download MakeMyTrip Mobile App
+	 
+	May 4
+	
+	
+	
+	
+Quincy Larson
+	
+How a 33-year-old museum tour guide became a professional web developer - her 18 month coding journey
+ - Here are this week's five links that are worth your time: 1. How a 33-year-old museum tour guide became a professional web developer - her 18 month coding journ
+	 
+	May 4
+	
+	
+	
+	
+Twitter
+	
+Vivek, see 3 new updates from Randy Orton
+ - Updates you should see Updates for Randy Orton 3 likes See all updates Settings | Help | Unsubscribe | Not my account We sent this email to @Hybriodominator Twi
+	 
+	May 4
+	
+	
+	
+	
+Saavn
+	
+All Your Music, All The Time
+ - Unlimited Downloads! With the power of unlimited downloads, you can listen offline no matter where you are. All you have to do is create a playlist, or pick fro
+	 
+	May 3
+	
+	
+	
+	
+HackerRank Team
+	
+Improve your Coding Skills with Java Exception Handling (Try-catch)
+ - Hi Vivek, Improve your skills with this challenge recommended for you: Java Exception Handling (Try-catch) Java | 28,569 submissions Use try-catch to test a blo
+	 
+	May 3
+	
+	
+	
+	
+Naukri.com Recruite.
+	
+Follow jobs of Datamatics recruiters
+ - Follow recruiters having relevant jobs for you Abhishek Saha Hr Manager Hiring for : 24 Online Info Technologies Private Limited Follow Send Message 277 Followe
+	 
+	May 3
+	
+	
+	
+	
+edX
+	
+⚡Enroll Now!⚡ Master new skills in 6 weeks or less.
+ - Discover exciting courses in Java, Virtual Reality, Entrepreneurial Mindset, Retail Fundamentals, and more! Sign Into Your Account Take your skills to the next
+	 
+	May 3
+	
+	
+	
+	
+Faraz, Draft 2
+	
+N queens
+ - Thanks a lot. Vivek Singh Red Hat Certified Professional | MCA(Hons) at Lovely Professional University P +91-8210012897 M +919473087056 E viveklp1995@gmail.com
+	 
+	May 3
+	
+	
+	
+	
+Udacity India
+	
+Become a Data Analyst: One of the hottest job roles of 2018!
+ - 59% of organizations claim an increase in the number of positions requiring data analysis skills. Data science: Most promising job area of 2018! According to a
+	 
+	May 3
+	
+	
+	
+	
+Paytm
+	
+You have paid Rs.50 to BHASHKAR YADAV
+ - Money Sent Successfully ₹ 50 To BHASHKAR YADAV's Paytm Wallet Linked to 9506377763 From VIVEK SINGH's Paytm Wallet Linked to 9473087056 May 3, 2018 18:47:42 Tra
+	 
+	May 3
+	
+	
+	
+	
+Udemy
+	
+Last chance at this week's top courses for only ₹770!
+ - It's our instructors that make Udemy what it is. Have you ever considered sharing your knowledge with millions of students worldwide? My Courses | Featured CHAN
+	 
+	May 3
+	
+	
+	
+	
+Picubed
+	
+Eligible for projects
+ - Lovely Professional University Jalandhar-Delhi G.T. Road, NH-1, Near Chaheru Railway Bridge Hi Vivek Singh, You are eligible in 2 projects. project Details Proj
+	 
+	May 3
+	
+	
+	
+	
+Amazon Web Services
+	
+AWSome Day Online Conference | Get Yourself Trained on AWS!
+ - Get Trained on AWS at AWSome Day Online Conference Join Amazon Web Services for AWSome Day Online Conference, a free, online training event that will provide yo
+	 
+	May 3
+	
+	
+	
+	
+Snapdeal
+	
+Last chance : 1-2-3 sale ends tonight
+ - 10% off using IndusInd bank cards. Daily Needs Store Daily Deals Smartwatches Recommended for you! lycan Home Gym 14 Kg Rubber Weight , D Rod , 3 Feet , Strate
+	 
+	May 3
+	
+	
+	
+	
+Coursera
+	
+Learn Skills That Get Results
+ - Real Skills, Real Results It’s never been easier to build your career with Coursera Reach your goals with flexible learning programs that fit your schedule.COUR
+	 
+	May 3
+	
+	
+	
+	
+Amazon.in
+	
+Turn your house into a home
+ - Home decor, furnishing, furniture and more. See more Your Amazon.in Today's Deals Amazon App Home decor to turn your house into a home Furnishing to reflect you
+	 
+	May 3
+	
+	
+	
+	
+Twitter
+	
+Top Tweets about Randy Orton
+ - Tweets about your top topics Randy Orton megan @megreyes_ So many of my former clients have been Day 1 when the Warriors played in the Cow Palace. I understand
+	 
+	May 3
+	
+	
+	
+	
+LinkedIn
+	
+Associate Engineer, SW at HARMAN International and 9 other jobs for you.
+ - Vivek Singh Top job picks for you Associate Engineer, SW HARMAN International · Bangalore, IN 1 alum Software Engineer (Java / Python / Ruby / Javascript / PHP
+	 
+	May 3
+	
+	
+	
+	
+Twitter
+	
+Vivek, see 8 new updates from Randy Orton
+ - Updates you should see Updates for Randy Orton 8 likes See all updates Settings | Help | Unsubscribe | Not my account We sent this email to @Hybriodominator Twi
+	 
+	May 2
+	
+	
+	
+	
+Sarabjit Kumar
+	
+Update in survey for MCA Summer Training 2018
+ - Dear Students, Two more options have been provided you for summer training to be held during June - July 2018. 1. Mean Stack Web Development (Online) 2. Manual
+	 
+	May 2
+	
+	
+	
+	
+MakeMyTrip
+	
+FREE Cancellation on Flights & Hotels!
+ - Enroll for MMTDOUBLEBLACK Now! Dear Customer, MMTDOUBLEBLACK is now available for Rs. 2,499 Rs. 1,499* only per year! Sign-up to be a part of this exclusive tra
+	 
+	May 2
+3.59 GB (23%) of 15 GB used
+Manage
+Terms - Privacy
+Last account activity: 0 minutes ago
+Details
+
+fair#lpu#opt2#
+
+
+String function
+
+1 upper(String)
+lower
+inticap
+reverse
+length
+replace
+substr select substr('Welcome',4,2)
+lpad 
+rpad(string,length,chr)
+ltrim remove white space.
+rtrim
+concat
+Q1. Sort array element.
+Q2. fetch the name from the table and display name and data
+Q3.Select name first character capital.
+
+select * from tablename where name like initcap(name);
+open n for select* from tablename where ascii(substr(name,1,1))>=65 and ..<=90;
+ascii('A') dual ;
+
+
+declare
+    n number;
+procedure p(a in number) is
+    i number;
+    rev number:=0;
+    r number;
+begin    
+    while a>0
+    loop
+        r:=mod(a,10);
+        rev:=(rev*10)+r;
+        n:=trunc(n/10);
+    end loop;
+    dbms_output.put_line('reverse is '||rev); 
+end p;
+begin
+n:=10767;
+p(n);
+end;
+
+how tp pass ref_cursor as procedure arguments.
+
+Procedue:::
+declare
+type cr is ref cursor;
+c1 cr;
+type rect is Record
+(
+name varchar2(20),
+age integer
+);
+r rect;
+procedure p(c1 cr) is 
+begin
+loop
+fetch c1 into r;
+exit when c1%notfound;
+dbms_output.put_line(r.name);
+end loop;
+end p;
+begin
+loop
+open c1 for select name,roll from t1 where rollno>3;
+exit when c1%notfound;
+p1(c1);
+end loop;
+end;
+
+
+Subtype
+::
+
+declare 
+subtype s1 is varchar(20);
+subtype t is integer;
+name s1;
+t1 t;
+begin
+name:='&n';
+t1:='&t1';
+dbms_output.put_line(name||t1);
+end;
+
+
+declare
+subtype s1 is varchar(20) NOT NULL;
+subtype t is varchar(20);
+s s1;
+x t;
+begin
+s:='&a';
+x:='&b';
+s:=x;
+dbms_output.put_line(s||x);
+end;
+
+--Salary top 3--
+declare 
+cursor c1 is select * from empl ;
+r empl%rowtype;
+begin
+open c1;
+loop
+fetch c1 into r;
+exit when (c1%rowcount>3);
+dbms_output.put_line(r.name||' '||r.salary);
+end loop;
+close c1;
+end;
+
+opt2
+lpu#
+west#
+
+
+--2nd highest salary--
+declare 
+cursor c1 is select distinct salary from empl order by salary desc;
+r empl.salary%type;
+begin
+open c1;
+loop
+fetch c1 into r;
+exit when (c1%notfound);
+if(c1%rowcount=2) then
+dbms_output.put_line('The second highest salary:: '||r);
+end if;
+end loop;
+close c1;
+end;
+
+--Date No of days--
+SELECT ename,round((SYSDATE-hiredate))FROM emp;
+
+declare 
+type n is ref cursor;
+n1 n;
+subtype s1 is varchar(10);
+subtype t1 is number;
+s s1;
+x t1;
+begin
+open n1 for SELECT ename,round((SYSDATE-hiredate)) FROM emp order by hiredate ;
+loop
+fetch n1 into s,x;
+exit when n1%notfound;
+dbms_output.put_line(s||' '||x);
+end loop;
+close n1;
+end;
+
+
+
+---------------------------------------------------------------------------
+
+Scalar functions-greatest,least
+Aggregrate functions-sum,max,min
+Parameterized Cursor
+Declare 
+cursor c1(i number) is select sum(salary) from t1 where id>i;
+v_id t1.id%type;
+s number;
+begin
+open c1(5);
+fetch c1 into s;
+dbms_output.put_line(s);
+end;
+
+---------------------------------------------------------------------------
+declare
+cursor c1(i number) is select sum(sal) from emp where empno>i;
+s number;
+begin
+open c1(7000);
+fetch c1 into s;
+dbms_output.put_line(s);
+close c1;
+end;
+
+----------------------------------------------------------------------------
+
+declare
+cursor c1(n emp.ename%type) is select ename from emp where job>n;
+i emp.ename%type;
+begin
+open c1('MANAGER');
+loop
+fetch c1 into i;
+exit when c1%notfound;
+dbms_output.put_line(i);
+end loop;
+close c1;
+end;
+--------------------------------------------------------------------------
+where rollno in(1,3);
+--------------------------------------------------------------------------
+declare
+cursor c1(i number,j number) is select ename from emp where empno=i or empno=j;
+n emp.ename%type;
+begin
+open c1(7839,7780);
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n);
+end loop;
+close c1;
+end;
+-----------------------------------------------------------------------------
+
+declare
+cursor c1(i number,j varchar2) is select ename from emp where empno>i and job=j;
+n emp.ename%type;
+begin
+open c1(7000,'MANAGER');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n);
+end loop;
+close c1;
+end;
+
+----------------------------------------------------------------------------
+From the user
+declare
+cursor c1(i number,j varchar2) is select ename from emp where empno>i and job=j;
+n emp.ename%type;
+begin
+open c1(:b,:c);
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n);
+end loop;
+close c1;
+end;
+
+-----------------------------------------------------------------------------
+show multpile data ::::::
+----------------------------------------------
+declare
+cursor c1(i number) is select ename,job from emp where empno>i;
+type rect is Record
+(
+name varchar2(20),
+jb varchar2(9)
+);
+n rect;
+begin
+open c1(7800);
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.name||' '||n.jb);
+end loop;
+close c1;
+end;
+------------------------------------------------------------------------------
+declare
+cursor c1(i varchar2) is select cust_first_name,cust_last_name from demo_customers where cust_first_name=i or cust_last_name=i;
+type rect is Record
+(
+fn varchar2(20),
+ln varchar2(20)
+);
+n rect;
+begin
+open c1('Edward');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.fn||' '||n.ln);
+end loop;
+close c1;
+end;
+
+-----------
+Fetch all name having same first/last or name:::
+declare
+cursor c1(i varchar2) is select cust_first_name,cust_last_name from demo_customers where cust_first_name like i or cust_last_name like i;
+type rect is Record
+(
+fn varchar2(20),
+ln varchar2(20)
+);
+n rect;
+begin
+open c1('Edward%');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.fn||' '||n.ln);
+end loop;
+close c1;
+end;
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+declare
+cursor c1(i varchar2) is select * from demo_customers where cust_first_name like i or cust_last_name like i;
+n demo_customers%rowtype;
+begin
+open c1('Edward%');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.cust_first_name||' '||n.cust_last_name);
+end loop;
+close c1;
+end;
+--------------------------------------------------------------------------------------- 
+
+
+declare
+type ar1 is varray(5) of number;
+type ar2 is varray(5) of number;
+a ar1;
+b ar2;
+c number:=0;
+begin
+a:=ar1(5,7,8,9,1);
+b:=ar2(5,7,6,9,1);
+for i in 1..5 loop 
+if(a(i)!=b(i)) then
+c:=1;
+end if;
+end loop;
+if(c=0) then
+dbms_output.put_line('Equal');
+else
+dbms_output.put_line('Not Equal');
+end if;
+end;
+
+
+-----------------------------------
+
+
+declare
+type ar1 is varray(5) of varchar2(20);
+type ar2 is varray(5) of varchar2(20);
+a ar1;
+b ar2;
+c number:=0;
+begin
+a:=ar1('aa','bb','cb','dd','ee');
+b:=ar2('aa','bb','cc','dd','ee');
+for i in 1..5 loop 
+if(a(i)!=b(i)) then
+c:=1;
+end if;
+end loop;
+if(c=0) then
+dbms_output.put_line('Equal');
+else
+dbms_output.put_line('Not Equal');
+end if;
+end;
+
+-----------------------------------------------------------------------------
+
+declare
+cursor c1(i varchar2) is select * from demo_customers where cust_city like i;
+n demo_customers%rowtype;
+n1 number;
+begin
+open c1('%g');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+n1:=c1%rowcount;
+end loop;
+dbms_output.put_line(n1);
+close c1;
+end;
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+declare
+cursor c1(i varchar2) is select * from demo_customers where cust_city like i;
+n demo_customers%rowtype;
+n1 number;
+begin
+
+
+
+
+
+open c1('%g');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+n1:=c1%rowcount;
+dbms_output.put_line(n.cust_first_name||' '||n.cust_state);
+end loop;
+dbms_output.put_line(n1);
+close c1;
+end;
+
+----------------------------------------------------------------------------
+
+lob
+clob
+blob
+declare
+l blob;
+begin
+select pic into l from t1 where roll=3;
+dbms_output.put_line('Length:: '||dbms_lob.getlength(l));
+end;
+
+
+select rawtohex('0FF') from dual;
+
+----------------------------------------------------------------------------
+
+pl/sql objects
+create or replace type type_name as object;
+name varchar(10);
+rollno varchar(14);
+class varchar(10);
+city varchar(10);
+);
+
+declare 
+o o1;
+begin
+o:=o1('Abc','1','BCA','Jal');
+dbms_output.put_line(o.name||o.rollno);
+end;
+
+
+create or replace type t2 as object
+(
+var1 number,
+member procedure display
+);
+
+create or replace type body t2 
+is 
+member procedure display is
+begin
+dbms_output.put_line(var1);
+end;
+end;
+
+declare 
+v t2:=t2(:v);
+begin
+v.display;
+end;
+
+
+
+
+create or replace type body t3 
+is 
+member procedure display is
+begin
+if (var1=var2) then
+dbms_output.put_line('Equal');
+end if;
+end;
+end;
+
+create or replace type t3 as object
+(
+var1 number,
+var2 number,
+member procedure display
+);
+
+declare 
+v t3:=t3(:x,:y);
+begin
+v.display;
+end;
+---------------------------------------------------------------------
+Function:::::
+
+declare 
+a number;
+b number;
+z number;
+function fname(a in number, b in number)
+return number
+is
+c number;
+begin 
+if(a>b) then
+c:=a;
+else
+c:=b;
+return c;
+end if;
+end fname;
+begin
+z:=fname(:a,:b);
+dbms_output.put_line(z);
+end;
+
+
+
+
+--------------------------------------------------------------------------------
+parameter function
+
+declare 
+a number;
+function fname(a in number)
+return varchar2
+is
+n stu.name%type;
+begin 
+select name into n from stu where id = a; 
+return n;
+end fname;
+begin
+dbms_output.put_line('Info:: '||fname(:a));
+end;
+
+
+
+
+
+create or replace type x1 as object
+(
+var1 varchar2(20),
+member function fname(a in number) return x1,
+member procedure display
+);
+
+
+create or replace type body x1 
+as 
+member function fname(a in number) return x1 is 
+begin
+select name into n from stu where id = a; 
+return n;
+end fname;
+member procedure display is 
+ begin  
+      dbms_output.put_line(var1); 
+   end display;  
+end;
+
+-----------------------------------------------------------------------------
+create or replace type o1 is object
+(
+Roll number,
+Name varchar(20),
+member function f1 return number,
+member function f2 return varchar
+);
+
+
+create or replace type body o1 as 
+member function f1 return number is 
+begin 
+return roll;
+end;
+member function f2 return varchar is 
+begin 
+return name;
+end;
+end;
+
+
+declare
+o o1:=o1(5,'Ankit');
+begin
+dbms_output.put_line(o.f1||' '||o.f2);
+end;
+
+
+----------------------------------------------------------------------------
+function overloading
+
+declare
+a number:=4;
+b number:=10;
+d number:=90;
+function large(a in number, b in number) return number is c number;
+begin 
+if(a>b) then
+c:=a;
+else
+c:=b;
+end if;
+return c;
+end;
+function large(a in number, b in number, d in number) return number is
+e number;
+begin 
+if(a>b) and (a>d) then
+e:=a;
+else if (b>a) and (b>d) then
+e:=b;
+else
+e:=d;
+end if;
+end if;
+return e;
+end;
+begin
+dbms_output.put_line(large(a,b));
+dbms_output.put_line(large(a,b,d));
+end;
+
+----------------------------------------------------------------------------
+Inheritence:::::::
+ 
+create or replace type p1 is object
+(
+roll  number,
+name varchar2(20),
+member function t1 return number
+) not final;
+
+--body of p1
+
+create or replace type body p1 as 
+member function t1 return number is 
+begin 
+return roll;
+end;
+end;
+
+create or replace type q1 under p1
+(
+member function t2 return varchar2
+)
+---body of q1
+create or replace type body q1 as 
+member function t2 return varchar2 is 
+begin 
+return name;
+end;
+end;
+
+declare 
+q q1:=q1(5,'Abc12');
+begin
+dbms_output.put_line(q.t1||q.t2);
+end;
+
+
+-----------------------------------------------------------------------------
+
+create or replace type per is object
+(
+r number,
+h number,
+member function area return number
+)not final;
+
+create or replace type body per as 
+member function area return number
+is
+begin 
+return (2*3.14*r*h);
+end;
+end;
+
+create or replace type per1 under per 
+(
+member function calper return number
+)
+
+create or replace type body per1 as 
+member function calper return number
+is
+begin
+return (2*3.14*r+2*h);
+end;
+end;
+
+
+declare
+p per1:=per1(6,10);
+begin
+dbms_output.put_line('Area '||p.area||' '||'Perimeter '||p.calper);
+end;
+
+-----------------------------------------------------------------------------
+Constructors
+
+create or replace type c1 as object
+(
+r number,
+n varchar(20),
+constructor function c1(r number,n varchar) return self as result
+);
+
+create or replace type body c1 as
+constructor function c1(r number,n varchar)
+return self as result
+as
+begin 
+self.r:=r;
+self.n:=n;
+dbms_output.put_line(r||n);
+return;
+end;
+end;
+
+
+declare
+x c1;
+begin
+x:=new c1(10,'jdsfh');
+end;
+
+
+lpu7025b@gmail.com
+abc1234
+
+
+-------------------------------------------------------------------------
+
+create or replace type s1 is object
+(
+v1 number,
+v2 number,
+member function add1 return number,
+member function div2 return number,
+member function mul3 return number,
+member function sub4 return number
+);
+
+create or replace type body s1 as 
+member function add1 return number is 
+h number;
+begin
+h:=v1+v2;
+if (mod(h,2))=0 and (h>0)  then
+dbms_output.put_line('Even');
+return h;
+else
+dbms_output.put_line('Odd');
+return h;
+end if;
+--return (v1+v2);
+end;
+
+
+member function div2 return number is 
+begin
+return (v1/v2);
+end;
+
+
+member function mul3 return number is 
+r number;
+begin
+r:=v1*v2;
+if(mod(r,5))=0 then
+dbms_output.put_line('Divisble by 5');
+return r;
+else
+dbms_output.put_line('Not Divisible');
+return r;
+end if;
+end;
+
+
+member function sub4 return number is 
+begin
+return (v1-v2);
+end;
+end;
+
+declare 
+s s1:=s1(10,20);
+begin
+dbms_output.put_line('Sum::'||s.add1||' Div::'||s.div2||' Mul::'||s.mul3||' Sub::'||s.sub4);
+end;
+
+--------------------------------------------------------------------------------------------------
+create or replace type n is object
+(
+cnt number,
+member function namef return number
+);
+
+create or replace type body n as 
+member function namef return number is 
+p number;
+x emp%rowtype;
+cursor c1 is select * from emp where ename like '%D';
+begin
+open c1;
+loop
+fetch c1 into x;
+exit when c1%notfound;
+dbms_output.put_line('Name::'||x.ename||' ');
+p:=c1%rowcount;
+end loop;
+--dbms_output.put_line('No of name::'||p||' ');
+return p;
+close c1;
+end;
+end;
+
+declare 
+nm n:=n(0);
+begin
+dbms_output.put_line(nm.namef);
+end;
+
+--------------------------------------------------------------------------------------------------
+create or replace type t11 as object
+(cgpa number,
+order member function comp (t t11) return number);
+
+
+create or replace type body t11 as
+order member function comp (t t11) return number is
+begin 
+if (cgpa > t.cgpa )then 
+return 1;
+else
+if (cgpa < t.cgpa) then
+return -1;
+else
+return 0;
+end if;
+end if;
+end;
+end;
+
+
+declare 
+s t11;
+s1 t11;
+--r number;
+begin
+s:=new t11(8);
+s1:=new t11(9);
+dbms_output.put_line(s.comp(s1));
+--r:=s.comp(s1);
+--dbms_output.put_line(r);
+end;
+
+
+
+create or replace type t12 as object
+(name varchar2(20),
+order member function comp (t t12) return number);
+
+
+create or replace type body t12 as
+order member function comp (t t12) return number is
+begin 
+if (name=t.name )then 
+return 1;
+else
+if (name!=t.name) then
+return -1;
+else
+return 0;
+end if;
+end if;
+end;
+end;
+
+
+declare 
+s t12;
+s1 t12;
+--r number;
+begin
+s:=new t12('Faraz');
+s1:=new t12('Faraz');
+dbms_output.put_line(s.comp(s1));
+--r:=s.comp(s1);
+--dbms_output.put_line(r);
+end;
+------------------------------------------------------------------------------------------------------------
+
+
+create or replace type per11 is object
+(
+r number,
+h number,
+member function area return number
+)not final;
+
+create or replace type body per11 as 
+member function area return number
+is
+begin 
+return (2*3.14*r*h);
+end;
+end;
+
+create or replace type per22 under per11 
+(
+member function calper return number
+)not final;
+
+create or replace type body per22 as 
+member function calper return number
+is
+begin
+return (2*3.14*r+2*h);
+end;
+end;
+
+
+create or replace type per3 under per22
+(
+member function caladdp return number
+)
+
+
+create or replace type body per3 as 
+member function caladdp return number
+is
+begin
+return (h*r);
+end;
+end;
+
+declare
+t per3:=per3(5,10);
+begin
+dbms_output.put_line('Area '||t.area||' '||'Perimeter '||t.calper||' '||t.caladdp);
+end;
+
+-------------------------------------------------------------------------------------
+
+
+create or replace type area as object
+(
+l number,
+b number,
+constructor function area(l number,b number) return self as result
+);
+
+create or replace type body area as
+constructor function area(l number,b number)
+return self as result
+as
+begin 
+self.l:=l;
+self.b:=b;
+dbms_output.put_line('Area '||(l*b));
+return;
+end;
+end;
+
+
+declare
+x area;
+begin
+x:=new area(10,5);
+end;
+
+-------------------------------------------------------------------------------------
+create or replace type tp1 as object
+(
+h number,
+w number,
+not instantiable not final member function info return number )
+not instantiable not final;
+
+
+Abstract Classes:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+create or replace type tp1 as object
+(
+h number,
+w number,
+not instantiable not final member function info return number )
+not instantiable not final;
+
+create or replace type op under tp1 
+(
+overriding member function info return number
+)
+---body of q1
+create or replace type body op as 
+overriding member function info return number is 
+begin 
+return (h*w);
+end;
+end;
+
+declare
+x op;
+begin
+x:=new op(10,5);
+dbms_output.put_line(x.info);
+end;
+
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+create or replace type rec as object
+(
+h number,
+w number,
+member function peri return number
+not instantiable not final member function area return number )
+not instantiable not final;
+
+create or replace type op1 under rec 
+(
+overriding member function peri return number,
+overriding member function area return number
+)
+
+create or replace type body op1 as 
+overriding member function area return number is 
+begin 
+return (h*w);
+end;
+overriding member function peri return number is
+begin
+return (2*h*w);
+end;
+end;
+
+declare
+x op1;
+begin
+x:=new op1(10,5);
+dbms_output.put_line(x.area||' '||x.peri);
+end;
+
+
+:::::::::::::::::::::::::::::::::
+
+create or replace type oo1 as object
+(
+h number,
+w number,
+member function display return number,
+not instantiable member function info return number )
+not instantiable not final;
+
+create or replace type body oo1 as
+member function display return number is 
+begin
+dbms_output.put_line('inside function');
+return h*w;
+end;
+end;
+
+
+create or replace type oo2 under oo1 
+(
+
+overriding member function info return number
+
+)
+
+create or replace type body oo2 as 
+overriding member function info return number is 
+begin 
+return (h*w);
+end;
+end;
+
+declare
+x oo2;
+begin
+x:=new oo2(10,5);
+dbms_output.put_line(x.info||x.display);
+end;
+
+
+single index
+composite index
+unique index
+
+
+create index index_name
+on table_name (col_name);
+
+create index index_name
+on table_name (col1,col2);
+ 
+create unique index index_name 
+on table_name (col_name);
+
+
+
+map method::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+object comparison
+
+create or replace type tname as object
+(
+num number,
+map member function m1 return number
+);
+
+create or replace type body tname is 
+map member function m1 return number
+is 
+begin
+return num;
+end;
+end;
+
+declare
+n tname:=tname(10);
+n1 tname:=tname(20);
+begin
+if(n1>n) then 
+dbms_output.put_line('Greater');
+else
+dbms_output.put_line('Lesser');
+end if;
+end;
+
+
+declare 
+c1 clob:='Don';
+c2 clob:='John'
+begin
+dbms_output.put_line(dbms_lob.compare(c1,c2));
+end;
+
+
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+Search element in array
+declare 
+type arr is varray(10) of number;
+s number:=:x;
+c number:=0;
+a arr;
+begin 
+a:=arr(4,5,10,1,55,2,6);
+for i in 1..7 loop
+if (a(i)= s) then
+c:=c+1;
+exit;
+else
+c:=0;
+end if;
+end loop;
+if(c=1)then
+dbms_output.put_line('Found');
+else
+dbms_output.put_line('Not Found');
+end if;
+end;
+
+
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+Overriding
+
+
+create or replace type oo as object
+(
+var1 number,
+var2 number,
+member function addnum return number
+)not final;
+
+create or replace type body oo as 
+member function addnum return number is
+res number; 
+begin
+res:=var1+var2;
+return res;
+end;
+end;
+
+
+create or replace type oochild under oo
+(
+overriding member function addnum return number
+);
+
+
+create or replace type body oochild as 
+overriding member function addnum return number is
+res number; 
+begin
+res:=var1-var2;
+return res;
+end;
+end;
+
+
+
+declare
+s oochild:=oochild(5,10);
+begin
+dbms_output.put_line(s.addnum);
+end;
+
+
+
+set serveroutput on;
+DECLARE 
+   type arraynum IS VARRAY(9) OF number; 
+   num arraynum; 
+   e number:=0;
+   o number:=0;
+BEGIN
+   num:= arraynum(10,2,55,3,23,66,44,78,9); 
+   FOR i in 1 .. 9 LOOP 
+   if num(i) mod 2 = 0 then
+   e:=e+1;
+   else
+   o:=o+1;
+   end if;
+   END LOOP;
+dbms_output.put_line('Even '||e);
+dbms_output.put_line('Odd '||o);
+for i in 1 .. 9 loop
+dbms_output.put_line(num(i));
+end loop; 
+end;
+
+
+
+
+create or replace type sdispl as object
+(
+name varchar2(20),
+rollno number,
+member procedure display 
+);
+
+create or replace type body sdispl is
+member procedure display is 
+begin 
+if (rollno < 4) then
+dbms_output.put_line('Error');
+else
+dbms_output.put_line(name||' '||rollno);
+end if;
+end; 
+end;
+
+declare
+s sdispl:=sdispl('Faraz',3);
+begin
+s.display;
+end;
+
+
+plsql ques.txt
+Displaying pl sql.txt.
+
+
+RECORD-
+ hetrogeneous structure
+- table based 
+- cursor based
+-user defined records
+
+%rowtype
+
+record_name table_name%Rowtype;
+select *from tbl1 where name like'----' (which have 4 characters)
+select *from tbl1 where name like 'A%';
+dbms_output.put_line(stu_rec.name|| stu_rec.roll ||);
+end;
+
+-- cursor based-
+declare
+rec1 emp1%rowtype;
+cursor csr1 is select * from emp1 where age=22;
+begin
+pen csr1;
+loop
+fetch csr1 into rec1;
+exit when csr1%notfound;
+dbms_output.put_line(rec1.name || rec1.id ||rec1.age);
+end loop;
+close csr1;
+end;
+
+---table based
+declare
+rec1 emp1%rowtype;
+begin
+select * into rec1 from emp1 where name='';
+dbms_output.put_line(rec1.name || rec1.id);
+end;
+
+---user defined cursor
+declare
+type r1 is record
+(id number,
+name varchar(20),
+class varchar(20));
+r r1;
+begin
+r.id:=:r;
+r.name:=:num1;
+dbms_output.put_line(r.name ||' '|| r.id);
+end;
+
+
+               PROCEDURES AND FUNCTIONS-
+
+procedures- doesnt return a value
+          - void sum(int,int)
+function-return a value
+        - int sum(int,int)
+  IN -input
+  OUT-output
+  IN/OUT -both
+
+declare
+procedure p( a in number, b in number, c out number);
+begin
+c=a+b;\
+dbms_output.put_line(c);
+end p;
+begin
+   x number:=2;
+   y number:=8;
+   z number:=4;
+p(x,y,z);
+end;
+
+
+--------for counting odd and even 
+declare
+cursor c1 is select id from emp1; 
+a emp1.id%type;
+c integer:=0;
+d integer:=0;
+begin
+open c1;
+loop
+fetch c1 into a;
+exit when c1%notfound;
+if(a  mod 2=0) then
+c:=c+1;
+else 
+d:=d+1;
+end if;
+end loop;
+dbms_output.put_line('Even no:' ||c);
+dbms_output.put_line('Odd no:' ||d);
+close c1;
+end;
+---refernce cursor
+declare
+c1 sys_refcursor;
+name varchar2(20);
+age number(4);
+begin
+open c1 for select name,age from emp1;
+loop
+fetch c1 into name,age;
+exit when c1%notfound;
+dbms_output.put_line(name||' '||age);
+end loop;
+end; 
+
+display names starting with k and id >13---
+declare
+type n is ref cursor;
+n1 n;
+t1 emp1%rowtype;
+t2 emp1%rowtype;
+begin
+open n1 for select * from emp1 where name like 'K%';
+loop
+fetch n1 into t1;
+exit when n1%notfound;
+dbms_output.put_line(lower(t1.name));
+end loop;
+open n1 for select * from emp1 where id>13 ;
+loop
+fetch n1 into t2;
+exit when n1%notfound;
+dbms_output.put_line(t2.id);
+end loop;
+
+end;
+
+STRONG REF CURSOR-
+declare
+type collec is ref cursor return emp1%rowtype;
+n collec;
+n1 emp1%rowtype;
+begin
+open n for select * from emp1;
+loop
+fetch n into n1;
+exit when n%notfound;
+dbms_output.put_line(n1.name);
+end loop;
+end;
+
+
+WEAK REF CURSOR USING RECORD-
+declare
+type r_cursor is ref cursor;
+c_emp r_cursor;
+type rec_emp is record
+(
+name varchar2(20),
+sal number(6)
+);
+er rec_emp;
+begin
+  open c_emp for select name,id from emp1;
+loop
+fetch c_emp into er;
+exit when c_emp%notfound;
+
+dbms_output.put_line(er.name||' '||er.sal);
+end loop;
+end;
+
+----how to pass ref cursor as procedure argument-
+
+declare
+type c_r is ref cursor;
+c1 c_r;
+type rec_t1 is record
+(
+name varchar(20),
+age integer
+);
+r rec_t1;
+procedure p(c1 c_r) is
+begin
+loop
+fetch c1 into r;
+exit when c1%notfound;
+dbms_output.put_line(r.name||' '||r.age);
+end loop;
+end;
+begin
+open c1 for select name,id from emp1 where id>11;
+loop
+
+exit when c1%notfound;
+p(c1);
+end loop;
+close c1;
+end;
+
+
+
+
+
+
+
+--subtypes--
+declare
+subtype s1 is varchar(30);
+subtype t is integer;
+name s1;
+t1 t;
+begin
+name:=:n;
+t1:=:t1;
+dbms_output.put_line(name||t1);
+end;
+
+
+
+declare
+subtype s1 is varchar(20);
+subtype s2 is varchar(20);
+s s1;
+s3 s2;
+begin
+s3:=:n;
+s:=null;
+s:=s3;
+dbms_output.put_line(s||' '|| s3);
+end;
+
+
+parameterized cursor -
+-----input from user
+declare
+cursor c2(i number) is select * from emp1 where id>=:i;
+v_id emp1%rowtype;
+i number;
+begin
+for v_id in c2(i) loop
+dbms_output.put_line(v_id.id);
+end loop;
+end;
+-----
+declare
+cursor c2(i number) is select sum(age) from emp1 where id>=i;
+v_id emp1.id%type;
+s number;
+begin
+open c1(15);
+fetch c1 into s;
+dbms_output.put_line(s);
+close c1;
+end;
+end;
+
+
+-------
+to compare two arrays
+declare
+type arr1 is varray(5) of varchar(5);
+type arr2 is varray(5) of varchar(5);
+a arr1;
+b arr2;
+begin
+a:=arr1(1,8,2,4,3);
+b:=arr2(1,8,5,6,3);
+for i in 1..5 loop
+if(a(i)=b(i)) then
+dbms_output.put_line(a(i)||' '||b(i)||' are equal');
+end if;
+end loop;
+end;
+
+
+function-
+create table tbl1 
+{
+name varchar2(10),
+id number
+);
+
+function-
+create or replace type o1 is object
+(
+roll number,
+name varchar(2),
+member function f1 return number,
+member function f2 return varchar
+);
+
+
+create or replace type body o1 as
+member function f1 return number
+is 
+begin
+  return roll;
+end;
+member function f2 return varchar
+is
+begin
+return name;
+end;
+end;
+
+declare
+o o1:=o1(4,'Vishakha');
+begin
+dbms_output.put_line(o.f1||' ' ||o.f2);
+end;
+
+Function overloading-
+declare
+a number;
+b number;
+c number;
+d number;
+function large(a in number,b in number) 
+return number IS
+e number;
+begin
+if(a>b) then
+e:=a;
+else
+e:=b;
+END IF;
+return e; 
+end;
+
+function large(a in number,b in number,c in number)
+return number is
+e number;
+begin
+if(a>b) and (a>c) then
+e:=a;
+else if(b>a) and (b>c) THEN
+e:=b;
+else
+e:=c;
+end if;
+END IF;
+return e;
+end;
+
+begin
+dbms_output.put_line(large(45,544));
+dbms_output.put_line(large(44,67,22));
+end;
+
+
+INHERITANCE-
+create or replace type o1 is object
+(
+roll number,
+name varchar(20)
+)not final;
+
+create or replace type body o2 as
+member function f1 return number
+is
+begin
+return roll;
+end;
+end;
+
+
+
+----create a function and pass id as rollno and display the corresponding info from table-
+declare
+declare
+obj childclassname:=childclassname(6,7);
+begin
+dbms_output.put_line(obj.chylender);
+end;
+
+---using inheritance print area of rectangle in base and perimeter in derived class.
+
+
+create or replace type base as object 
+(
+l number,
+b number,
+member function fun1 return number
+)not final;
+ 
+
+create or replace type body base as 
+member function fun1 return number is
+begin
+return(l*b);
+end;
+end;
+
+
+create or replace type derive under base
+(
+member function fun2 return number
+);
+
+create or replace type body derive as
+member function fun2 return number is
+begin
+return(2*(l+b));
+end;
+end;
+
+
+declare
+obj derive:=derive(4,3);
+begin
+dbms_output.put_line('area of rectangle:' ||obj.fun1);
+dbms_output.put_line('perimter of rectabgle: '||obj.fun2);
+end;
+
+
+
+----Constructor-
+create or replace type c1 as object
+(
+l number,
+roll number,
+name varchar(20),
+constructor function c1(roll number,name varchar) return self as result
+);
+
+create or replace type body c1 as 
+constructor function c1(roll number,name varchar)
+return self as result as
+begin
+self.roll:=roll;
+self.name:=name;
+return;
+end;
+end;
+
+declare 
+c c1:=new c1(12,'shape1');
+begin
+dbms_output.put_line(c.name || c.roll);
+end;
+
+fair#lpu#opt2#
+
+
+String function
+
+1 upper(String)
+lower
+inticap
+reverse
+length
+replace
+substr select substr('Welcome',4,2)
+lpad 
+rpad(string,length,chr)
+ltrim remove white space.
+rtrim
+concat
+Q1. Sort array element.
+Q2. fetch the name from the table and display name and data
+Q3.Select name first character capital.
+
+select * from tablename where name like initcap(name);
+open n for select* from tablename where ascii(substr(name,1,1))>=65 and ..<=90;
+ascii('A') dual ;
+
+
+declare
+    n number;
+procedure p(a in number) is
+    i number;
+    rev number:=0;
+    r number;
+begin    
+    while a>0
+    loop
+        r:=mod(a,10);
+        rev:=(rev*10)+r;
+        n:=trunc(n/10);
+    end loop;
+    dbms_output.put_line('reverse is '||rev); 
+end p;
+begin
+n:=10767;
+p(n);
+end;
+
+how tp pass ref_cursor as procedure arguments.
+
+Procedue:::
+declare
+type cr is ref cursor;
+c1 cr;
+-type rect is Record
+(
+name varchar2(20),
+age integer
+);
+r rect;
+procedure p(c1 cr) is 
+begin
+loop
+fetch c1 into r;
+exit when c1%notfound;
+dbms_output.put_line(r.name);
+end loop;
+end p;
+begin
+loop
+open c1 for select name,roll from t1 where rollno>3;
+exit when c1%notfound;
+p1(c1);
+end loop;
+end;
+
+
+Subtype
+::
+
+declare 
+subtype s1 is varchar(20);
+subtype t is integer;
+name s1;
+t1 t;
+begin
+name:='&n';
+t1:='&t1';
+dbms_output.put_line(name||t1);
+end;
+
+
+declare
+subtype s1 is varchar(20) NOT NULL;
+subtype t is varchar(20);
+s s1;
+x t;
+begin
+s:='&a';
+x:='&b';
+s:=x;
+dbms_output.put_line(s||x);
+end;
+
+--Salary top 3--
+declare 
+cursor c1 is select * from empl ;
+r empl%rowtype;
+begin
+open c1;
+loop
+fetch c1 into r;
+exit when (c1%rowcount>3);
+dbms_output.put_line(r.name||' '||r.salary);
+end loop;
+close c1;
+end;
+
+opt2
+lpu#
+west#
+
+
+--2nd highest salary--
+declare 
+cursor c1 is select distinct salary from empl order by salary desc;
+r empl.salary%type;
+begin
+open c1;
+loop
+fetch c1 into r;
+exit when (c1%notfound);
+if(c1%rowcount=2) then
+dbms_output.put_line('The second highest salary:: '||r);
+end if;
+end loop;
+close c1;
+end;
+
+--Date No of days--
+SELECT ename,round((SYSDATE-hiredate))FROM emp;
+
+declare 
+type n is ref cursor;
+n1 n;
+subtype s1 is varchar(10);
+subtype t1 is number;
+s s1;
+x t1;
+begin
+open n1 for SELECT ename,round((SYSDATE-hiredate)) FROM emp order by hiredate ;
+loop
+fetch n1 into s,x;
+exit when n1%notfound;
+dbms_output.put_line(s||' '||x);
+end loop;
+close n1;
+end;
+
+
+
+---------------------------------------------------------------------------
+
+Scalar functions-greatest,least
+Aggregrate functions-sum,max,min
+Parameterized Cursor
+Declare 
+cursor c1(i number) is select sum(salary) from t1 where id>i;
+v_id t1.id%type;
+s number;
+begin
+open c1(5);
+fetch c1 into s;
+dbms_output.put_line(s);
+end;
+
+---------------------------------------------------------------------------
+declare
+cursor c1(i number) is select sum(sal) from emp where empno>i;
+s number;
+begin
+open c1(7000);
+fetch c1 into s;
+dbms_output.put_line(s);
+close c1;
+end;
+
+----------------------------------------------------------------------------
+
+declare
+cursor c1(n emp.ename%type) is select ename from emp where job>n;
+i emp.ename%type;
+begin
+open c1('MANAGER');
+loop
+fetch c1 into i;
+exit when c1%notfound;
+dbms_output.put_line(i);
+end loop;
+close c1;
+end;
+--------------------------------------------------------------------------
+where rollno in(1,3);
+--------------------------------------------------------------------------
+declare
+cursor c1(i number,j number) is select ename from emp where empno=i or empno=j;
+n emp.ename%type;
+begin
+open c1(7839,7780);
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n);
+end loop;
+close c1;
+end;
+-----------------------------------------------------------------------------
+
+declare
+cursor c1(i number,j varchar2) is select ename from emp where empno>i and job=j;
+n emp.ename%type;
+begin
+open c1(7000,'MANAGER');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n);
+end loop;
+close c1;
+end;
+
+----------------------------------------------------------------------------
+From the user
+declare
+cursor c1(i number,j varchar2) is select ename from emp where empno>i and job=j;
+n emp.ename%type;
+begin
+open c1(:b,:c);
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n);
+end loop;
+close c1;
+end;
+
+-----------------------------------------------------------------------------
+show multpile data ::::::
+----------------------------------------------
+declare
+cursor c1(i number) is select ename,job from emp where empno>i;
+type rect is Record
+(
+name varchar2(20),
+jb varchar2(9)
+);
+n rect;
+begin
+open c1(7800);
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.name||' '||n.jb);
+end loop;
+close c1;
+end;
+------------------------------------------------------------------------------
+declare
+cursor c1(i varchar2) is select cust_first_name,cust_last_name from demo_customers where cust_first_name=i or cust_last_name=i;
+type rect is Record
+(
+fn varchar2(20),
+ln varchar2(20)
+);
+n rect;
+begin
+open c1('Edward');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.fn||' '||n.ln);
+end loop;
+close c1;
+end;
+
+-----------
+Fetch all name having same first/last or name:::
+declare
+cursor c1(i varchar2) is select cust_first_name,cust_last_name from demo_customers where cust_first_name like i or cust_last_name like i;
+type rect is Record
+(
+fn varchar2(20),
+ln varchar2(20)
+);
+n rect;
+begin
+open c1('Edward%');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.fn||' '||n.ln);
+end loop;
+close c1;
+end;
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+declare
+cursor c1(i varchar2) is select * from demo_customers where cust_first_name like i or cust_last_name like i;
+n demo_customers%rowtype;
+begin
+open c1('Edward%');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.cust_first_name||' '||n.cust_last_name);
+end loop;
+close c1;
+end;
+--------------------------------------------------------------------------------------- 
+
+
+declare
+type ar1 is varray(5) of number;
+type ar2 is varray(5) of number;
+a ar1;
+b ar2;
+c number:=0;
+begin
+a:=ar1(5,7,8,9,1);
+b:=ar2(5,7,6,9,1);
+for i in 1..5 loop 
+if(a(i)!=b(i)) then
+c:=1;
+end if;
+end loop;
+if(c=0) then
+dbms_output.put_line('Equal');
+else
+dbms_output.put_line('Not Equal');
+end if;
+end;
+
+
+-----------------------------------
+
+
+declare
+type ar1 is varray(5) of varchar2(20);
+type ar2 is varray(5) of varchar2(20);
+a ar1;
+b ar2;
+c number:=0;
+begin
+a:=ar1('aa','bb','cb','dd','ee');
+b:=ar2('aa','bb','cc','dd','ee');
+for i in 1..5 loop 
+if(a(i)!=b(i)) then
+c:=1;
+end if;
+end loop;
+if(c=0) then
+dbms_output.put_line('Equal');
+else
+dbms_output.put_line('Not Equal');
+end if;
+end;
+
+-----------------------------------------------------------------------------
+
+declare
+cursor c1(i varchar2) is select * from demo_customers where cust_city like i;
+n demo_customers%rowtype;
+n1 number;
+begin
+open c1('%g');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+n1:=c1%rowcount;
+end loop;
+dbms_output.put_line(n1);
+close c1;
+end;
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+declare
+cursor c1(i varchar2) is select * from demo_customers where cust_city like i;
+n demo_customers%rowtype;
+n1 number;
+begin
+
+
+
+
+
+open c1('%g');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+n1:=c1%rowcount;
+dbms_output.put_line(n.cust_first_name||' '||n.cust_state);
+end loop;
+dbms_output.put_line(n1);
+close c1;
+end;
+
+----------------------------------------------------------------------------
+
+lob
+clob
+blob
+declare
+l blob;
+begin
+select pic into l from t1 where roll=3;
+dbms_output.put_line('Length:: '||dbms_lob.getlength(l));
+end;
+
+
+select rawtohex('0FF') from dual;
+
+----------------------------------------------------------------------------
+
+pl/sql objects
+create or replace type type_name as object;
+name varchar(10);
+rollno varchar(14);
+class varchar(10);
+city varchar(10);
+);
+
+declare 
+o o1;
+begin
+o:=o1('Abc','1','BCA','Jal');
+dbms_output.put_line(o.name||o.rollno);
+end;
+
+
+create or replace type t2 as object
+(
+var1 number,
+member procedure display
+);
+
+create or replace type body t2 
+is 
+member procedure display is
+begin
+dbms_output.put_line(var1);
+end;
+end;
+
+declare 
+v t2:=t2(:v);
+begin
+v.display;
+end;
+
+
+
+
+create or replace type body t3 
+is 
+member procedure display is
+begin
+if (var1=var2) then
+dbms_output.put_line('Equal');
+end if;
+end;
+end;
+
+create or replace type t3 as object
+(
+var1 number,
+var2 number,
+member procedure display
+);
+
+declare 
+v t3:=t3(:x,:y);
+begin
+v.display;
+end;
+---------------------------------------------------------------------
+Function:::::
+
+declare 
+a number;
+b number;
+z number;
+function fname(a in number, b in number)
+return number
+is
+c number;
+begin 
+if(a>b) then
+c:=a;
+else
+c:=b;
+return c;
+end if;
+end fname;
+begin
+z:=fname(:a,:b);
+dbms_output.put_line(z);
+end;
+
+
+
+
+--------------------------------------------------------------------------------
+parameter function
+
+declare 
+a number;
+function fname(a in number)
+return varchar2
+is
+n stu.name%type;
+begin 
+select name into n from stu where id = a; 
+return n;
+end fname;
+begin
+dbms_output.put_line('Info:: '||fname(:a));
+end;
+
+
+
+
+
+create or replace type x1 as object
+(
+var1 varchar2(20),
+member function fname(a in number) return x1,
+member procedure display
+);
+
+
+create or replace type body x1 
+as 
+member function fname(a in number) return x1 is 
+begin
+select name into n from stu where id = a; 
+return n;
+end fname;
+member procedure display is 
+ begin  
+      dbms_output.put_line(var1); 
+   end display;  
+end;
+
+-----------------------------------------------------------------------------
+create or replace type o1 is object
+(
+Roll number,
+Name varchar(20),
+member function f1 return number,
+member function f2 return varchar
+);
+
+
+create or replace type body o1 as 
+member function f1 return number is 
+begin 
+return roll;
+end;
+member function f2 return varchar is 
+begin 
+return name;
+end;
+end;
+
+
+declare
+o o1:=o1(5,'Ankit');
+begin
+dbms_output.put_line(o.f1||' '||o.f2);
+end;
+
+
+----------------------------------------------------------------------------
+function overloading
+
+declare
+a number:=4;
+b number:=10;
+d number:=90;
+function large(a in number, b in number) return number is c number;
+begin 
+if(a>b) then
+c:=a;
+else
+c:=b;
+end if;
+return c;
+end;
+function large(a in number, b in number, d in number) return number is
+e number;
+begin 
+if(a>b) and (a>d) then
+e:=a;
+else if (b>a) and (b>d) then
+e:=b;
+else
+e:=d;
+end if;
+end if;
+return e;
+end;
+begin
+dbms_output.put_line(large(a,b));
+dbms_output.put_line(large(a,b,d));
+end;
+
+----------------------------------------------------------------------------
+Inheritence:::::::
+ 
+create or replace type p1 is object
+(
+roll  number,
+name varchar2(20),
+member function t1 return number
+) not final;
+
+--body of p1
+
+create or replace type body p1 as 
+member function t1 return number is 
+begin 
+return roll;
+end;
+end;
+
+create or replace type q1 under p1
+(
+member function t2 return varchar2
+)
+---body of q1
+create or replace type body q1 as 
+member function t2 return varchar2 is 
+begin 
+return name;
+end;
+end;
+
+declare 
+q q1:=q1(5,'Abc12');
+begin
+dbms_output.put_line(q.t1||q.t2);
+end;
+
+
+-----------------------------------------------------------------------------
+
+create or replace type per is object
+(
+r number,
+h number,
+member function area return number
+)not final;
+
+create or replace type body per as 
+member function area return number
+is
+begin 
+return (2*3.14*r*h);
+end;
+end;
+
+create or replace type per1 under per 
+(
+member function calper return number
+)
+
+create or replace type body per1 as 
+member function calper return number
+is
+begin
+return (2*3.14*r+2*h);
+end;
+end;
+
+
+declare
+p per1:=per1(6,10);
+begin
+dbms_output.put_line('Area '||p.area||' '||'Perimeter '||p.calper);
+end;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
