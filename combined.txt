@@ -1,0 +1,3144 @@
+%rowtype
+
+declare
+rec demo_customers%rowtype;
+cursor c1 is select * from demo_customers where credit_limit = '1000';
+begin
+open c1;
+loop
+fetch c1 into rec;
+exit when c1%notfound;
+dbms_output.put_line(rec.Cust_city);
+end loop;
+close c1;
+end;
+/////////////////////////////////////////////////////////////// LOOP
+
+DECLARE 
+   i number(1); 
+   j number(1); 
+BEGIN 
+   << outer_loop >> 
+   FOR i IN 1..3 LOOP 
+      << inner_loop >> 
+      FOR j IN 1..3 LOOP 
+         dbms_output.put_line('i is: '|| i || ' and j is: ' || j); 
+      END loop inner_loop; 
+   END loop outer_loop; 
+END; 
+
+////////////////////////////////////////////////////////////// varray
+
+DECLARE 
+   type namesarray IS VARRAY(5) OF VARCHAR2(10); 
+   type grades IS VARRAY(5) OF INTEGER; 
+   names namesarray; 
+   marks grades; 
+   total integer; 
+BEGIN 
+   names := namesarray('Kavita', 'Pritam', 'Ayan', 'Rishav', 'Aziz'); 
+   marks:= grades(98, 97, 78, 87, 92); 
+   total := names.count; 
+   dbms_output.put_line('Total '|| total || ' Students'); 
+   FOR i in 1 .. total LOOP 
+      dbms_output.put_line('Student: ' || names(i) || ' 
+      Marks: ' || marks(i)); 
+   END LOOP; 
+END;
+////////////////////////////////////////////////////////////////////// VARRAY with type
+DECLARE 
+   CURSOR c_customers is 
+   SELECT  name FROM customers; 
+   type c_list is varray (6) of customers.name%type; 
+   name_list c_list := c_list(); 
+   counter integer :=0; 
+BEGIN 
+   FOR n IN c_customers LOOP 
+      counter := counter + 1; 
+      name_list.extend; 
+      name_list(counter)  := n.name; 
+      dbms_output.put_line('Customer('||counter ||'):'||name_list(counter)); 
+   END LOOP; 
+END; 
+/////////////////////////////////////////////////////////////////////// Associative Array
+DECLARE
+  TYPE population_type IS TABLE OF NUMBER INDEX BY VARCHAR2(64);
+  country_population population_type;
+  continent_population population_type;
+  howmany NUMBER;
+  which VARCHAR2(64)
+
+BEGIN
+  country_population('Greenland') := 100000;
+  country_population('Iceland') := 750000;
+  howmany := country_population('Greenland');
+
+  continent_population('Australia') := 30000000;
+  continent_population('Antarctica') := 1000; -- Creates new entry
+  continent_population('Antarctica') := 1001; -- Replaces previous 
+value
+  which := continent_population.FIRST; -- Returns 'Antarctica'
+-- as that comes first alphabetically.
+  which := continent_population.LAST; -- Returns 'Australia'
+  howmany := continent_population(continent_population.LAST);
+-- Returns the value corresponding to the last key, in this
+-- case the population of Australia.
+END;
+///////////////////////////////////////////////////////////////// Table using rowtype
+
+DECLARE
+   TYPE EmpTabTyp IS TABLE OF emp%ROWTYPE
+      INDEX BY BINARY_INTEGER;
+   emp_tab EmpTabTyp;
+BEGIN
+   /* Retrieve employee record. */
+   SELECT * INTO emp_tab(7468) FROM emp WHERE empno = 7468;
+END;
+
+//////////////////////////////////////////////////////////////// Associative Array
+
+
+DECLARE 
+   TYPE salary IS TABLE OF NUMBER INDEX BY VARCHAR2(20); 
+   salary_list salary; 
+   name   VARCHAR2(20); 
+BEGIN 
+   -- adding elements to the table 
+   salary_list('Rajnish') := 62000; 
+   salary_list('Minakshi') := 75000; 
+   salary_list('Martin') := 100000; 
+   salary_list('James') := 78000;  
+   
+   -- printing the table 
+   name := salary_list.FIRST; 
+   WHILE name IS NOT null LOOP 
+      dbms_output.put_line 
+      ('Salary of ' || name || ' is ' || TO_CHAR(salary_list(name))); 
+      name := salary_list.NEXT(name); 
+   END LOOP; 
+END; 
+///////////////////////////////////////////////////////////////// Table
+
+DECLARE 
+   CURSOR c_customers is 
+      select name from customers; 
+
+   TYPE c_list IS TABLE of customers.Name%type INDEX BY binary_integer; 
+   name_list c_list; 
+   counter integer :=0; 
+BEGIN 
+   FOR n IN c_customers LOOP 
+      counter := counter +1; 
+      name_list(counter) := n.name; 
+      dbms_output.put_line('Customer('||counter||'):'||name_lis t(counter)); 
+   END LOOP; 
+END; 
+
+//////////////////////////////////////////////////////////////// Nested Table
+
+DECLARE 
+   TYPE names_table IS TABLE OF VARCHAR2(10); 
+   TYPE grades IS TABLE OF INTEGER;  
+   names names_table; 
+   marks grades; 
+   total integer; 
+BEGIN 
+   names := names_table('Kavita', 'Pritam', 'Ayan', 'Rishav', 'Aziz'); 
+   marks:= grades(98, 97, 78, 87, 92); 
+   total := names.count; 
+   dbms_output.put_line('Total '|| total || ' Students'); 
+   FOR i IN 1 .. total LOOP 
+      dbms_output.put_line('Student:'||names(i)||', Marks:' || marks(i)); 
+   end loop; 
+END; 
+
+
+DECLARE 
+   CURSOR c_customers is  
+      SELECT  name FROM customers;  
+   TYPE c_list IS TABLE of customerS.No.ame%type; 
+   name_list c_list := c_list(); 
+   counter integer :=0; 
+BEGIN 
+   FOR n IN c_customers LOOP 
+      counter := counter +1; 
+      name_list.extend; 
+      name_list(counter)  := n.name; 
+      dbms_output.put_line('Customer('||counter||'):'||name_list(counter)); 
+   END LOOP; 
+END; 
+/////////////////////////////////////////////////////////////
+
+
+assoc array
+v array
+simple
+array
+
+usiing cursor
+v array
+nested table
+///Passing ref cursor as procedure arg
+
+
+///////////////////////////////////////////////////////////////////////Reverse of a Number using procedure
+
+
+///////////////////////////////////////////////////////////////////////String Functions 
+upper(String)
+lower(String)
+initcap(String) - First letter capital
+reverse()
+length() 
+replace(String, Character 1, Character 2)
+substr(String, Starting position, ending position)
+lpad(String, length, char)
+rpad(String, Length, Char)
+ltrim(String)
+rtrim(String)
+concat(String1, String2)
+
+///////////////////////////////////////////////////////////////////////Fetch data from table & display the names of those having first letter capital
+declare
+type collec is ref cursor return demo_customers%rowtype;
+n collec;
+
+n1 demo_customers%rowtype;
+
+begin
+
+open n for select * from demo_customers where ascii(substr(cust_first_name,1,1)) >= 65 and ascii(substr(cust_first_name,1,1)) <= 90 ;
+
+loop
+
+fetch n into n1;
+
+exit when n%notfound;
+
+dbms_output.put_line(n1.cust_first_name);
+end loop;
+end;
+
+////////////////////////////////////////////////////////////////////////Sorting of Array Elements
+DECLARE 
+  
+   type arraynum IS VARRAY(5) OF number; 
+   num arraynum; 
+   m number; 
+   total number;
+BEGIN 
+   
+   num:= arraynum(98, 97, 78, 87, 92); 
+ 
+
+   FOR i in 1 .. 5 LOOP 
+       For j in 1 .. 4 loop
+        if (num(j)>num(j+1)) then
+           m:= num(j);
+          num(j):=num(j+1);
+           num(j+1):= m;
+      end if;
+    End Loop;
+   END LOOP;
+
+for i in 1 .. 5 loop
+dbms_output.put_line(num(i));
+end loop; 
+END;
+
+////////////////////////////////////////////////////////////////////////name starting from k check if name is in small letter convert into small 
+
+
+//////////////////////////////////////////////////////////////////// ref cursor - weak with record
+
+declare
+
+type rcr is ref cursor;
+cm rcr;
+type rcrd is record (
+cust_first_name varchar2(20), credit_limit number(6));
+
+er rcrd;
+
+begin
+
+open cm for select cust_first_name, credit_limit from demo_customers;
+
+loop
+
+fetch cm into er;
+
+exit when cm%notfound;
+dbms_output.put_line(er.cust_first_name || ' has a limit of ' || er.credit_limit);
+
+end loop;
+end;
+
+
+/////////////////////////////////////////////////////////////////////user defined ref cursor - strong ( returns a value & can only be used to fetch data from a single table)
+
+declare
+type collec is ref cursor return demo_customers%rowtype;
+n collec;
+
+n1 demo_customers%rowtype;
+
+begin
+
+open n for select * from demo_customers;
+
+loop
+
+fetch n into n1;
+
+exit when n%notfound;
+
+dbms_output.put_line(n1.cust_first_name);
+end loop;
+end;
+				
+
+/////////////////////////////////////////////////////////////////////user defined ref cursor - weak (doesnt return any value)
+
+****strong ref - can only fetch data from one table****
+
+declare
+type n is ref cursor;
+n1 n;
+t1 test%rowtype;
+t2 demo_customers%rowtype;
+
+begin
+
+open n1 for  select * from test;
+
+loop
+fetch n1 into t1;
+
+exit when n1%notfound;
+
+dbms_output.put_line(t1.info);
+
+exit when n1%notfound;
+
+end loop;
+
+open n1 for select * from demo_customers;
+loop
+fetch n1 into t2;
+
+exit when n1%notfound;
+
+dbms_output.put_line(t2.cust_first_name);
+
+end loop;
+
+end;
+
+
+
+//////////////////////////////////////////////////////////////////using collection count number of odd and even
+
+
+//////////////////////////////////////////////////////////////////Cursor using for loop
+declare
+
+name demo_customers.cust_first_name%type;
+credit demo_customers.credit_limit%type;
+
+cursor c1 is select cust_first_name, credit_limit from demo_customers;
+
+begin
+open c1;
+loop
+fetch c1 into name, credit;
+
+exit when c1%notfound;
+
+dbms_output.put_line(name || ' has  a limit of '||credit);
+end loop;
+end;
+
+
+//////////////////////////////////////////////////////////////////Reference Cursor - Points to memory address
+Reference cannot be used with for loop
+
+declare
+ cursor c1 is select cust_first_name, credit_limit from demo_customers;
+
+begin
+
+--open c1;
+
+for i in c1 loop
+
+dbms_output.put_line(i.cust_first_name || ' Has limit of '|| i.credit_limit);
+
+end loop;
+ end;
+
+
+
+declare
+ c1 sys_refcursor;
+name varchar(20);
+credit number(5);
+ 
+
+begin
+open c1 for select cust_first_name , credit_limit from demo_customers;
+
+loop
+fetch c1 into name, credit;
+exit when c1%notfound;
+dbms_output.put_line(name || ' Has limit of '|| credit);
+
+end loop;
+ end;
+
+//////////////////////////////////////////////////////////////////Using cursor to find odd/even
+
+declare
+cursor c1 is select cust_postal_code from demo_customers;
+num integer :=0;
+even integer :=0;
+odd integer :=0;
+
+begin
+
+OPEN c1;
+
+LOOP
+      FETCH c1 INTO num;
+      EXIT WHEN c1%NOTFOUND;
+      if mod(num,2)=0 then
+      dbms_output.put_line(num || ' is Even');
+      even:= even+1;
+      else
+      dbms_output.put_line(num || ' is Odd');
+      odd:= odd+1;
+     end if;
+   END LOOP;
+
+dbms_output.put_line('Odd :' || odd ||' Even:' || even);
+end;
+ 
+
+
+
+
+/////////////////////////////////////////////////////////////Passing record to a procedure 
+declare
+type r1 is record
+(id number,
+name varchar2(20),
+city varchar2(25));
+r r1;
+procedure print(s in out r1) is
+begin
+dbms_output.put_line(s.id || s.name);
+end print;
+
+
+begin
+r.id:=1; r.name:='abc';
+print(r);
+end;
+
+
+////////////////////////////////////////////////////////////creating procedure
+DECLARE 
+   a number; 
+   b number; 
+   c number;
+PROCEDURE add(x IN number, y IN number, z OUT number) IS 
+BEGIN 
+  z:=x+y;
+dbms_output.put_line(z);
+END;   
+BEGIN 
+   a:= 23; 
+   b:= 45; 
+   add(a, b, c); 
+ 
+END; 
+
+//////////////////////////////////////////////////////////////// user defined record	
+declare
+type r1 is record
+(id number,
+name varchar2(20),
+city varchar2(25));
+
+r r1;
+
+begin
+r.id:=1; r.name:='abc';
+dbms_output.put_line(r.id || r.name);
+end;
+////////////////////////////////////////////////////////////////record using cursor
+declare
+rec demo_customers%rowtype;
+cursor c1 is select * from demo_customers where cust_state like '%A';
+begin
+open c1;
+loop
+	
+exit when c1%notfound; 
+
+dbms_output.put_line(rec.cust_first_name ||' State: '|| rec.cust_city);
+end loop;
+close c1;
+end;
+//////////////////////////////////////////////////////////////using table record
+declare
+rec demo_customers%rowtype;
+begin
+select * into rec from demo_customers where cust_state like 'N%';
+
+dbms_output.put_line(rec.cust_first_name ||' State: '|| rec.cust_city);
+end;
+
+//////////////////////////////////////////////////////////////%rowtype
+
+declare
+rec demo_customers%rowtype;
+cursor c1 is select * from demo_customers where credit_limit = '1000';
+begin
+open c1;
+loop
+fetch c1 into rec;
+exit when c1%notfound;
+dbms_output.put_line(rec.Cust_city);
+end loop;
+close c1;
+end;
+/////////////////////////////////////////////////////////////// LOOP
+
+DECLARE 
+   i number(1); 
+   j number(1); 
+BEGIN 
+   << outer_loop >> 
+   FOR i IN 1..3 LOOP 
+      << inner_loop >> 
+      FOR j IN 1..3 LOOP 
+         dbms_output.put_line('i is: '|| i || ' and j is: ' || j); 
+      END loop inner_loop; 
+   END loop outer_loop; 
+END; 
+
+////////////////////////////////////////////////////////////// varray
+
+DECLARE 
+   type namesarray IS VARRAY(5) OF VARCHAR2(10); 
+   type grades IS VARRAY(5) OF INTEGER; 
+   names namesarray; 
+   marks grades; 
+   total integer; 
+BEGIN 
+   names := namesarray('Kavita', 'Pritam', 'Ayan', 'Rishav', 'Aziz'); 
+   marks:= grades(98, 97, 78, 87, 92); 
+   total := names.count; 
+   dbms_output.put_line('Total '|| total || ' Students'); 
+   FOR i in 1 .. total LOOP 
+      dbms_output.put_line('Student: ' || names(i) || ' 
+      Marks: ' || marks(i)); 
+   END LOOP; 
+END;
+////////////////////////////////////////////////////////////////////// VARRAY with type
+DECLARE 
+   CURSOR c_customers is 
+   SELECT  name FROM customers; 
+   type c_list is varray (6) of customers.name%type; 
+   name_list c_list := c_list(); 
+   counter integer :=0; 
+BEGIN 
+   FOR n IN c_customers LOOP 
+      counter := counter + 1; 
+      name_list.extend; 
+      name_list(counter)  := n.name; 
+      dbms_output.put_line('Customer('||counter ||'):'||name_list(counter)); 
+   END LOOP; 
+END; 
+/////////////////////////////////////////////////////////////////////// Associative Array
+DECLARE
+  TYPE population_type IS TABLE OF NUMBER INDEX BY VARCHAR2(64);
+  country_population population_type;
+  continent_population population_type;
+  howmany NUMBER;
+  which VARCHAR2(64)
+
+BEGIN
+  country_population('Greenland') := 100000;
+  country_population('Iceland') := 750000;
+  howmany := country_population('Greenland');
+
+  continent_population('Australia') := 30000000;
+  continent_population('Antarctica') := 1000; -- Creates new entry
+  continent_population('Antarctica') := 1001; -- Replaces previous 
+value
+  which := continent_population.FIRST; -- Returns 'Antarctica'
+-- as that comes first alphabetically.
+  which := continent_population.LAST; -- Returns 'Australia'
+  howmany := continent_population(continent_population.LAST);
+-- Returns the value corresponding to the last key, in this
+-- case the population of Australia.
+END;
+///////////////////////////////////////////////////////////////// Table using rowtype
+
+DECLARE
+   TYPE EmpTabTyp IS TABLE OF emp%ROWTYPE
+      INDEX BY BINARY_INTEGER;
+   emp_tab EmpTabTyp;
+BEGIN
+   /* Retrieve employee record. */
+   SELECT * INTO emp_tab(7468) FROM emp WHERE empno = 7468;
+END;
+
+//////////////////////////////////////////////////////////////// Associative Array
+
+
+DECLARE 
+   TYPE salary IS TABLE OF NUMBER INDEX BY VARCHAR2(20); 
+   salary_list salary; 
+   name   VARCHAR2(20); 
+BEGIN 
+   -- adding elements to the table 
+   salary_list('Rajnish') := 62000; 
+   salary_list('Minakshi') := 75000; 
+   salary_list('Martin') := 100000; 
+   salary_list('James') := 78000;  
+   
+   -- printing the table 
+   name := salary_list.FIRST; 
+   WHILE name IS NOT null LOOP 
+      dbms_output.put_line 
+      ('Salary of ' || name || ' is ' || TO_CHAR(salary_list(name))); 
+      name := salary_list.NEXT(name); 
+   END LOOP; 
+END; 
+///////////////////////////////////////////////////////////////// Table
+
+DECLARE 
+   CURSOR c_customers is 
+      select name from customers; 
+
+   TYPE c_list IS TABLE of customers.Name%type INDEX BY binary_integer; 
+   name_list c_list; 
+   counter integer :=0; 
+BEGIN 
+   FOR n IN c_customers LOOP 
+      counter := counter +1; 
+      name_list(counter) := n.name; 
+      dbms_output.put_line('Customer('||counter||'):'||name_lis t(counter)); 
+   END LOOP; 
+END; 
+
+//////////////////////////////////////////////////////////////// Nested Table
+
+DECLARE 
+   TYPE names_table IS TABLE OF VARCHAR2(10); 
+   TYPE grades IS TABLE OF INTEGER;  
+   names names_table; 
+   marks grades; 
+   total integer; 
+BEGIN 
+   names := names_table('Kavita', 'Pritam', 'Ayan', 'Rishav', 'Aziz'); 
+   marks:= grades(98, 97, 78, 87, 92); 
+   total := names.count; 
+   dbms_output.put_line('Total '|| total || ' Students'); 
+   FOR i IN 1 .. total LOOP 
+      dbms_output.put_line('Student:'||names(i)||', Marks:' || marks(i)); 
+   end loop; 
+END; 
+
+
+DECLARE 
+   CURSOR c_customers is  
+      SELECT  name FROM customers;  
+   TYPE c_list IS TABLE of customerS.No.ame%type; 
+   name_list c_list := c_list(); 
+   counter integer :=0; 
+BEGIN 
+   FOR n IN c_customers LOOP 
+      counter := counter +1; 
+      name_list.extend; 
+      name_list(counter)  := n.name; 
+      dbms_output.put_line('Customer('||counter||'):'||name_list(counter)); 
+   END LOOP; 
+END; 
+/////////////////////////////////////////////////////////////
+
+
+assoc array
+v array
+simple
+array
+
+usiing cursor
+v array
+nested table///////////////////////////////////////////////////////////////////////String Functions 
+upper(String)
+lower(String)
+initcap(String) - First letter capital
+reverse()
+length() 
+replace(String, Character 1, Character 2)
+substr()
+
+///////////////////////////////////////////////////////////////////////Fetch data from table & display the names of those having first letter capital
+
+
+////////////////////////////////////////////////////////////////////////Sorting of Array Elements
+
+
+////////////////////////////////////////////////////////////////////////name starting from k check if name is in small letter convert into small 
+
+
+//////////////////////////////////////////////////////////////////// ref cursor - weak with record
+
+declare
+
+type rcr is ref cursor;
+cm rcr;
+type rcrd is record (
+cust_first_name varchar2(20), credit_limit number(6));
+
+er rcrd;
+
+begin
+
+open cm for select cust_first_name, credit_limit from demo_customers;
+
+loop
+
+fetch cm into er;
+
+exit when cm%notfound;
+dbms_output.put_line(er.cust_first_name || ' has a limit of ' || er.credit_limit);
+
+end loop;
+end;
+
+
+/////////////////////////////////////////////////////////////////////user defined ref cursor - strong ( returns a value & can only be used to fetch data from a single table)
+
+declare
+type collec is ref cursor return demo_customers%rowtype;
+n collec;
+
+n1 demo_customers%rowtype;
+
+begin
+
+open n for select * from demo_customers;
+
+loop
+
+fetch n into n1;
+
+exit when n%notfound;
+
+dbms_output.put_line(n1.cust_first_name);
+end loop;
+end;
+				
+
+/////////////////////////////////////////////////////////////////////user defined ref cursor - weak (doesnt return any value)
+
+****strong ref - can only fetch data from one table****
+
+declare
+type n is ref cursor;
+n1 n;
+t1 test%rowtype;
+t2 demo_customers%rowtype;
+
+begin
+
+open n1 for  select * from test;
+
+loop
+fetch n1 into t1;
+
+exit when n1%notfound;
+
+dbms_output.put_line(t1.info);
+
+exit when n1%notfound;
+
+end loop;
+
+open n1 for select * from demo_customers;
+loop
+fetch n1 into t2;
+
+exit when n1%notfound;
+
+dbms_output.put_line(t2.cust_first_name);
+
+end loop;
+
+end;
+
+
+
+//////////////////////////////////////////////////////////////////using collection count number of odd and even
+
+
+//////////////////////////////////////////////////////////////////Cursor using for loop
+declare
+
+name demo_customers.cust_first_name%type;
+credit demo_customers.credit_limit%type;
+
+cursor c1 is select cust_first_name, credit_limit from demo_customers;
+
+begin
+open c1;
+loop
+fetch c1 into name, credit;
+
+exit when c1%notfound;
+
+dbms_output.put_line(name || ' has  a limit of '||credit);
+end loop;
+end;
+
+
+//////////////////////////////////////////////////////////////////Reference Cursor - Points to memory address
+Reference cannot be used with for loop
+
+declare
+ cursor c1 is select cust_first_name, credit_limit from demo_customers;
+
+begin
+
+--open c1;
+
+for i in c1 loop
+
+dbms_output.put_line(i.cust_first_name || ' Has limit of '|| i.credit_limit);
+
+end loop;
+ end;
+
+
+
+declare
+ c1 sys_refcursor;
+name varchar(20);
+credit number(5);
+ 
+
+begin
+open c1 for select cust_first_name , credit_limit from demo_customers;
+
+loop
+fetch c1 into name, credit;
+exit when c1%notfound;
+dbms_output.put_line(name || ' Has limit of '|| credit);
+
+end loop;
+ end;
+
+//////////////////////////////////////////////////////////////////Using cursor to find odd/even
+
+declare
+cursor c1 is select cust_postal_code from demo_customers;
+num integer :=0;
+even integer :=0;
+odd integer :=0;
+
+begin
+
+OPEN c1;
+
+LOOP
+      FETCH c1 INTO num;
+      EXIT WHEN c1%NOTFOUND;
+      if mod(num,2)=0 then
+      dbms_output.put_line(num || ' is Even');
+      even:= even+1;
+      else
+      dbms_output.put_line(num || ' is Odd');
+      odd:= odd+1;
+     end if;
+   END LOOP;
+
+dbms_output.put_line('Odd :' || odd ||' Even:' || even);
+end;
+ 
+
+
+
+
+/////////////////////////////////////////////////////////////Passing record to a procedure 
+declare
+type r1 is record
+(id number,
+name varchar2(20),
+city varchar2(25));
+r r1;
+procedure print(s in out r1) is
+begin
+dbms_output.put_line(s.id || s.name);
+end print;
+
+
+begin
+r.id:=1; r.name:='abc';
+print(r);
+end;
+
+
+////////////////////////////////////////////////////////////creating procedure
+DECLARE 
+   a number; 
+   b number; 
+   c number;
+PROCEDURE add(x IN number, y IN number, z OUT number) IS 
+BEGIN 
+  z:=x+y;
+dbms_output.put_line(z);
+END;   
+BEGIN 
+   a:= 23; 
+   b:= 45; 
+   add(a, b, c); 
+ 
+END; 
+
+//////////////////////////////////////////////////////////////// user defined record	
+declare
+type r1 is record
+(id number,
+name varchar2(20),
+city varchar2(25));
+
+r r1;
+
+begin
+r.id:=1; r.name:='abc';
+dbms_output.put_line(r.id || r.name);
+end;
+////////////////////////////////////////////////////////////////record using cursor
+declare
+rec demo_customers%rowtype;
+cursor c1 is select * from demo_customers where cust_state like '%A';
+begin
+open c1;
+loop
+	
+exit when c1%notfound; 
+
+dbms_output.put_line(rec.cust_first_name ||' State: '|| rec.cust_city);
+end loop;
+close c1;
+end;
+//////////////////////////////////////////////////////////////using table record
+declare
+rec demo_customers%rowtype;
+begin
+select * into rec from demo_customers where cust_state like 'N%';
+
+dbms_output.put_line(rec.cust_first_name ||' State: '|| rec.cust_city);
+end;
+
+//////////////////////////////////////////////////////////////%rowtype
+
+declare
+rec demo_customers%rowtype;
+cursor c1 is select * from demo_customers where credit_limit = '1000';
+begin
+open c1;
+loop
+fetch c1 into rec;
+exit when c1%notfound;
+dbms_output.put_line(rec.Cust_city);
+end loop;
+close c1;
+end;
+/////////////////////////////////////////////////////////////// LOOP
+
+DECLARE 
+   i number(1); 
+   j number(1); 
+BEGIN 
+   << outer_loop >> 
+   FOR i IN 1..3 LOOP 
+      << inner_loop >> 
+      FOR j IN 1..3 LOOP 
+         dbms_output.put_line('i is: '|| i || ' and j is: ' || j); 
+      END loop inner_loop; 
+   END loop outer_loop; 
+END; 
+
+////////////////////////////////////////////////////////////// varray
+
+DECLARE 
+   type namesarray IS VARRAY(5) OF VARCHAR2(10); 
+   type grades IS VARRAY(5) OF INTEGER; 
+   names namesarray; 
+   marks grades; 
+   total integer; 
+BEGIN 
+   names := namesarray('Kavita', 'Pritam', 'Ayan', 'Rishav', 'Aziz'); 
+   marks:= grades(98, 97, 78, 87, 92); 
+   total := names.count; 
+   dbms_output.put_line('Total '|| total || ' Students'); 
+   FOR i in 1 .. total LOOP 
+      dbms_output.put_line('Student: ' || names(i) || ' 
+      Marks: ' || marks(i)); 
+   END LOOP; 
+END;
+////////////////////////////////////////////////////////////////////// VARRAY with type
+DECLARE 
+   CURSOR c_customers is 
+   SELECT  name FROM customers; 
+   type c_list is varray (6) of customers.name%type; 
+   name_list c_list := c_list(); 
+   counter integer :=0; 
+BEGIN 
+   FOR n IN c_customers LOOP 
+      counter := counter + 1; 
+      name_list.extend; 
+      name_list(counter)  := n.name; 
+      dbms_output.put_line('Customer('||counter ||'):'||name_list(counter)); 
+   END LOOP; 
+END; 
+/////////////////////////////////////////////////////////////////////// Associative Array
+DECLARE
+  TYPE population_type IS TABLE OF NUMBER INDEX BY VARCHAR2(64);
+  country_population population_type;
+  continent_population population_type;
+  howmany NUMBER;
+  which VARCHAR2(64)
+
+BEGIN
+  country_population('Greenland') := 100000;
+  country_population('Iceland') := 750000;
+  howmany := country_population('Greenland');
+
+  continent_population('Australia') := 30000000;
+  continent_population('Antarctica') := 1000; -- Creates new entry
+  continent_population('Antarctica') := 1001; -- Replaces previous 
+value
+  which := continent_population.FIRST; -- Returns 'Antarctica'
+-- as that comes first alphabetically.
+  which := continent_population.LAST; -- Returns 'Australia'
+  howmany := continent_population(continent_population.LAST);
+-- Returns the value corresponding to the last key, in this
+-- case the population of Australia.
+END;
+///////////////////////////////////////////////////////////////// Table using rowtype
+
+DECLARE
+   TYPE EmpTabTyp IS TABLE OF emp%ROWTYPE
+      INDEX BY BINARY_INTEGER;
+   emp_tab EmpTabTyp;
+BEGIN
+   /* Retrieve employee record. */
+   SELECT * INTO emp_tab(7468) FROM emp WHERE empno = 7468;
+END;
+
+//////////////////////////////////////////////////////////////// Associative Array
+
+
+DECLARE 
+   TYPE salary IS TABLE OF NUMBER INDEX BY VARCHAR2(20); 
+   salary_list salary; 
+   name   VARCHAR2(20); 
+BEGIN 
+   -- adding elements to the table 
+   salary_list('Rajnish') := 62000; 
+   salary_list('Minakshi') := 75000; 
+   salary_list('Martin') := 100000; 
+   salary_list('James') := 78000;  
+   
+   -- printing the table 
+   name := salary_list.FIRST; 
+   WHILE name IS NOT null LOOP 
+      dbms_output.put_line 
+      ('Salary of ' || name || ' is ' || TO_CHAR(salary_list(name))); 
+      name := salary_list.NEXT(name); 
+   END LOOP; 
+END; 
+///////////////////////////////////////////////////////////////// Table
+
+DECLARE 
+   CURSOR c_customers is 
+      select name from customers; 
+
+   TYPE c_list IS TABLE of customers.Name%type INDEX BY binary_integer; 
+   name_list c_list; 
+   counter integer :=0; 
+BEGIN 
+   FOR n IN c_customers LOOP 
+      counter := counter +1; 
+      name_list(counter) := n.name; 
+      dbms_output.put_line('Customer('||counter||'):'||name_lis t(counter)); 
+   END LOOP; 
+END; 
+
+//////////////////////////////////////////////////////////////// Nested Table
+
+DECLARE 
+   TYPE names_table IS TABLE OF VARCHAR2(10); 
+   TYPE grades IS TABLE OF INTEGER;  
+   names names_table; 
+   marks grades; 
+   total integer; 
+BEGIN 
+   names := names_table('Kavita', 'Pritam', 'Ayan', 'Rishav', 'Aziz'); 
+   marks:= grades(98, 97, 78, 87, 92); 
+   total := names.count; 
+   dbms_output.put_line('Total '|| total || ' Students'); 
+   FOR i IN 1 .. total LOOP 
+      dbms_output.put_line('Student:'||names(i)||', Marks:' || marks(i)); 
+   end loop; 
+END; 
+
+
+DECLARE 
+   CURSOR c_customers is  
+      SELECT  name FROM customers;  
+   TYPE c_list IS TABLE of customerS.No.ame%type; 
+   name_list c_list := c_list(); 
+   counter integer :=0; 
+BEGIN 
+   FOR n IN c_customers LOOP 
+      counter := counter +1; 
+      name_list.extend; 
+      name_list(counter)  := n.name; 
+      dbms_output.put_line('Customer('||counter||'):'||name_list(counter)); 
+   END LOOP; 
+END; 
+/////////////////////////////////////////////////////////////
+
+
+assoc array
+v array
+simple
+array
+
+usiing cursor
+v array
+nested tableString function
+1 upper(String)
+lower
+inticap
+reverse
+length
+replace
+substr select substr('Welcome',4,2)
+lpad 
+rpad(string,length,chr)
+ltrim remove white space.
+rtrim
+concat
+Q1. Sort array element.
+Q2. fetch the name from the table and display name and data
+Q3.Select name first character capital.
+
+select * from tablename where name like initcap(name);
+open n for select* from tablename where ascii(substr(name,1,1))>=65 and ..<=90;
+ascii('A') dual ;
+
+
+declare
+    n number;
+procedure p(a in number) is
+    i number;
+    rev number:=0;
+    r number;
+begin    
+    while a>0
+    loop
+        r:=mod(a,10);
+        rev:=(rev*10)+r;
+        n:=trunc(n/10);
+    end loop;
+    dbms_output.put_line('reverse is '||rev); 
+end p;
+begin
+n:=10767;
+p(n);
+end;
+
+how tp pass ref_cursor as procedure arguments.
+
+Procedue:::
+declare
+type cr is ref cursor
+c1 cr;
+type rect is Record
+(
+name varchar2(20),
+age integer;
+);
+r rect;
+procedure p(c1 cr) is 
+begin
+loop
+fetch c1 into r;
+exit whwn c1%notfound;
+dbms_output.put_line(r.name);
+end loop;
+end p;
+begin
+loop
+open c1 for select name,roll from t1 where rollno>3;
+exit when c1%notfound;
+p1(c1);
+end loop;
+end;
+
+
+Subtype
+::
+
+declare 
+subtype s1 is varchar(20);
+subtype t is integer;
+name s1;
+t1 t;
+begin
+name:='&n';
+t1:='&t1';
+dbms_output.put_line(name||t1);
+end;
+
+
+declare
+subtype s1 is varchar(20) NOT NULL;
+subtype t is varchar(20);
+s s1;
+x s2;
+begin
+s:='&a';
+x:='&b';
+s=x;
+dbms_output.put_line(s||x);
+
+
+ 
+
+
+fair#lpu#opt2#
+
+
+String function
+
+1 upper(String)
+lower
+inticap
+reverse
+length
+replace
+substr select substr('Welcome',4,2)
+lpad 
+rpad(string,length,chr)
+ltrim remove white space.
+rtrim
+concat
+Q1. Sort array element.
+Q2. fetch the name from the table and display name and data
+Q3.Select name first character capital.
+
+select * from tablename where name like initcap(name);
+open n for select* from tablename where ascii(substr(name,1,1))>=65 and ..<=90;
+ascii('A') dual ;
+
+
+declare
+    n number;
+procedure p(a in number) is
+    i number;
+    rev number:=0;
+    r number;
+begin    
+    while a>0
+    loop
+        r:=mod(a,10);
+        rev:=(rev*10)+r;
+        n:=trunc(n/10);
+    end loop;
+    dbms_output.put_line('reverse is '||rev); 
+end p;
+begin
+n:=10767;
+p(n);
+end;
+
+how tp pass ref_cursor as procedure arguments.
+
+Procedue:::
+declare
+type cr is ref cursor;
+c1 cr;
+type rect is Record
+(
+name varchar2(20),
+age integer
+);
+r rect;
+procedure p(c1 cr) is 
+begin
+loop
+fetch c1 into r;
+exit when c1%notfound;
+dbms_output.put_line(r.name);
+end loop;
+end p;
+begin
+loop
+open c1 for select name,roll from t1 where rollno>3;
+exit when c1%notfound;
+p1(c1);
+end loop;
+end;
+
+
+Subtype
+::
+
+declare 
+subtype s1 is varchar(20);
+subtype t is integer;
+name s1;
+t1 t;
+begin
+name:='&n';
+t1:='&t1';
+dbms_output.put_line(name||t1);
+end;
+
+
+declare
+subtype s1 is varchar(20) NOT NULL;
+subtype t is varchar(20);
+s s1;
+x t;
+begin
+s:='&a';
+x:='&b';
+s:=x;
+dbms_output.put_line(s||x);
+end;
+
+--Salary top 3--
+declare 
+cursor c1 is select * from empl ;
+r empl%rowtype;
+begin
+open c1;
+loop
+fetch c1 into r;
+exit when (c1%rowcount>3);
+dbms_output.put_line(r.name||' '||r.salary);
+end loop;
+close c1;
+end;
+
+opt2
+lpu#
+west#
+
+
+--2nd highest salary--
+declare 
+cursor c1 is select distinct salary from empl order by salary desc;
+r empl.salary%type;
+begin
+open c1;
+loop
+fetch c1 into r;
+exit when (c1%notfound);
+if(c1%rowcount=2) then
+dbms_output.put_line('The second highest salary:: '||r);
+end if;
+end loop;
+close c1;
+end;
+
+--Date No of days--
+SELECT ename,round((SYSDATE-hiredate))FROM emp;
+
+declare 
+type n is ref cursor;
+n1 n;
+subtype s1 is varchar(10);
+subtype t1 is number;
+s s1;
+x t1;
+begin
+open n1 for SELECT ename,round((SYSDATE-hiredate)) FROM emp order by hiredate ;
+loop
+fetch n1 into s,x;
+exit when n1%notfound;
+dbms_output.put_line(s||' '||x);
+end loop;
+close n1;
+end;
+
+
+
+---------------------------------------------------------------------------
+
+Scalar functions-greatest,least
+Aggregrate functions-sum,max,min
+Parameterized Cursor
+Declare 
+cursor c1(i number) is select sum(salary) from t1 where id>i;
+v_id t1.id%type;
+s number;
+begin
+open c1(5);
+fetch c1 into s;
+dbms_output.put_line(s);
+end;
+
+---------------------------------------------------------------------------
+declare
+cursor c1(i number) is select sum(sal) from emp where empno>i;
+s number;
+begin
+open c1(7000);
+fetch c1 into s;
+dbms_output.put_line(s);
+close c1;
+end;
+
+----------------------------------------------------------------------------
+
+declare
+cursor c1(n emp.ename%type) is select ename from emp where job>n;
+i emp.ename%type;
+begin
+open c1('MANAGER');
+loop
+fetch c1 into i;
+exit when c1%notfound;
+dbms_output.put_line(i);
+end loop;
+close c1;
+end;
+--------------------------------------------------------------------------
+where rollno in(1,3);
+--------------------------------------------------------------------------
+declare
+cursor c1(i number,j number) is select ename from emp where empno=i or empno=j;
+n emp.ename%type;
+begin
+open c1(7839,7780);
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n);
+end loop;
+close c1;
+end;
+-----------------------------------------------------------------------------
+
+declare
+cursor c1(i number,j varchar2) is select ename from emp where empno>i and job=j;
+n emp.ename%type;
+begin
+open c1(7000,'MANAGER');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n);
+end loop;
+close c1;
+end;
+
+----------------------------------------------------------------------------
+From the user
+declare
+cursor c1(i number,j varchar2) is select ename from emp where empno>i and job=j;
+n emp.ename%type;
+begin
+open c1(:b,:c);
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n);
+end loop;
+close c1;
+end;
+
+-----------------------------------------------------------------------------
+show multpile data ::::::
+----------------------------------------------
+declare
+cursor c1(i number) is select ename,job from emp where empno>i;
+type rect is Record
+(
+name varchar2(20),
+jb varchar2(9)
+);
+n rect;
+begin
+open c1(7800);
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.name||' '||n.jb);
+end loop;
+close c1;
+end;
+------------------------------------------------------------------------------
+declare
+cursor c1(i varchar2) is select cust_first_name,cust_last_name from demo_customers where cust_first_name=i or cust_last_name=i;
+type rect is Record
+(
+fn varchar2(20),
+ln varchar2(20)
+);
+n rect;
+begin
+open c1('Edward');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.fn||' '||n.ln);
+end loop;
+close c1;
+end;
+
+-----------
+Fetch all name having same first/last or name:::
+declare
+cursor c1(i varchar2) is select cust_first_name,cust_last_name from demo_customers where cust_first_name like i or cust_last_name like i;
+type rect is Record
+(
+fn varchar2(20),
+ln varchar2(20)
+);
+n rect;
+begin
+open c1('Edward%');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.fn||' '||n.ln);
+end loop;
+close c1;
+end;
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+declare
+cursor c1(i varchar2) is select * from demo_customers where cust_first_name like i or cust_last_name like i;
+n demo_customers%rowtype;
+begin
+open c1('Edward%');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.cust_first_name||' '||n.cust_last_name);
+end loop;
+close c1;
+end;
+--------------------------------------------------------------------------------------- 
+
+
+declare
+type ar1 is varray(5) of number;
+type ar2 is varray(5) of number;
+a ar1;
+b ar2;
+c number:=0;
+begin
+a:=ar1(5,7,8,9,1);
+b:=ar2(5,7,6,9,1);
+for i in 1..5 loop 
+if(a(i)!=b(i)) then
+c:=1;
+end if;
+end loop;
+if(c=0) then
+dbms_output.put_line('Equal');
+else
+dbms_output.put_line('Not Equal');
+end if;
+end;
+
+
+-----------------------------------
+
+
+declare
+type ar1 is varray(5) of varchar2(20);
+type ar2 is varray(5) of varchar2(20);
+a ar1;
+b ar2;
+c number:=0;
+begin
+a:=ar1('aa','bb','cb','dd','ee');
+b:=ar2('aa','bb','cc','dd','ee');
+for i in 1..5 loop 
+if(a(i)!=b(i)) then
+c:=1;
+end if;
+end loop;
+if(c=0) then
+dbms_output.put_line('Equal');
+else
+dbms_output.put_line('Not Equal');
+end if;
+end;
+
+-----------------------------------------------------------------------------
+
+declare
+cursor c1(i varchar2) is select * from demo_customers where cust_city like i;
+n demo_customers%rowtype;
+n1 number;
+begin
+open c1('%g');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+n1:=c1%rowcount;
+end loop;
+dbms_output.put_line(n1);
+close c1;
+end;
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+declare
+cursor c1(i varchar2) is select * from demo_customers where cust_city like i;
+n demo_customers%rowtype;
+n1 number;
+begin
+
+
+
+
+
+open c1('%g');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+n1:=c1%rowcount;
+dbms_output.put_line(n.cust_first_name||' '||n.cust_state);
+end loop;
+dbms_output.put_line(n1);
+close c1;
+end;
+
+----------------------------------------------------------------------------
+
+lob
+clob
+blob
+declare
+l blob;
+begin
+select pic into l from t1 where roll=3;
+dbms_output.put_line('Length:: '||dbms_lob.getlength(l));
+end;
+
+
+select rawtohex('0FF') from dual;
+
+----------------------------------------------------------------------------
+
+pl/sql objects
+create or replace type type_name as object;
+name varchar(10);
+rollno varchar(14);
+class varchar(10);
+city varchar(10);
+);
+
+declare 
+o o1;
+begin
+o:=o1('Abc','1','BCA','Jal');
+dbms_output.put_line(o.name||o.rollno);
+end;
+
+
+create or replace type t2 as object
+(
+var1 number,
+member procedure display
+);
+
+create or replace type body t2 
+is 
+member procedure display is
+begin
+dbms_output.put_line(var1);
+end;
+end;
+
+declare 
+v t2:=t2(:v);
+begin
+v.display;
+end;
+
+
+
+
+create or replace type body t3 
+is 
+member procedure display is
+begin
+if (var1=var2) then
+dbms_output.put_line('Equal');
+end if;
+end;
+end;
+
+create or replace type t3 as object
+(
+var1 number,
+var2 number,
+member procedure display
+);
+
+declare 
+v t3:=t3(:x,:y);
+begin
+v.display;
+end;
+---------------------------------------------------------------------
+Function:::::
+
+declare 
+a number;
+b number;
+z number;
+function fname(a in number, b in number)
+return number
+is
+c number;
+begin 
+if(a>b) then
+c:=a;
+else
+c:=b;
+return c;
+end if;
+end fname;
+begin
+z:=fname(:a,:b);
+dbms_output.put_line(z);
+end;
+
+
+
+
+--------------------------------------------------------------------------------
+parameter function
+
+declare 
+a number;
+function fname(a in number)
+return varchar2
+is
+n stu.name%type;
+begin 
+select name into n from stu where id = a; 
+return n;
+end fname;
+begin
+dbms_output.put_line('Info:: '||fname(:a));
+end;
+
+
+
+
+
+create or replace type x1 as object
+(
+var1 varchar2(20),
+member function fname(a in number) return x1,
+member procedure display
+);
+
+
+create or replace type body x1 
+as 
+member function fname(a in number) return x1 is 
+begin
+select name into n from stu where id = a; 
+return n;
+end fname;
+member procedure display is 
+ begin  
+      dbms_output.put_line(var1); 
+   end display;  
+end;
+
+-----------------------------------------------------------------------------
+create or replace type o1 is object
+(
+Roll number,
+Name varchar(20),
+member function f1 return number,
+member function f2 return varchar
+);
+
+
+create or replace type body o1 as 
+member function f1 return number is 
+begin 
+return roll;
+end;
+member function f2 return varchar is 
+begin 
+return name;
+end;
+end;
+
+
+declare
+o o1:=o1(5,'Ankit');
+begin
+dbms_output.put_line(o.f1||' '||o.f2);
+end;
+
+
+----------------------------------------------------------------------------
+function overloading
+
+declare
+a number:=4;
+b number:=10;
+d number:=90;
+function large(a in number, b in number) return number is c number;
+begin 
+if(a>b) then
+c:=a;
+else
+c:=b;
+end if;
+return c;
+end;
+function large(a in number, b in number, d in number) return number is
+e number;
+begin 
+if(a>b) and (a>d) then
+e:=a;
+else if (b>a) and (b>d) then
+e:=b;
+else
+e:=d;
+end if;
+end if;
+return e;
+end;
+begin
+dbms_output.put_line(large(a,b));
+dbms_output.put_line(large(a,b,d));
+end;
+
+----------------------------------------------------------------------------
+Inheritence:::::::
+ 
+create or replace type p1 is object
+(
+roll  number,
+name varchar2(20),
+member function t1 return number
+) not final;
+
+--body of p1
+
+create or replace type body p1 as 
+member function t1 return number is 
+begin 
+return roll;
+end;
+end;
+
+create or replace type q1 under p1
+(
+member function t2 return varchar2
+)
+---body of q1
+create or replace type body q1 as 
+member function t2 return varchar2 is 
+begin 
+return name;
+end;
+end;
+
+declare 
+q q1:=q1(5,'Abc12');
+begin
+dbms_output.put_line(q.t1||q.t2);
+end;
+
+
+-----------------------------------------------------------------------------
+
+create or replace type per is object
+(
+r number,
+h number,
+member function area return number
+)not final;
+
+create or replace type body per as 
+member function area return number
+is
+begin 
+return (2*3.14*r*h);
+end;
+end;
+
+create or replace type per1 under per 
+(
+member function calper return number
+)
+
+create or replace type body per1 as 
+member function calper return number
+is
+begin
+return (2*3.14*r+2*h);
+end;
+end;
+
+
+declare
+p per1:=per1(6,10);
+begin
+dbms_output.put_line('Area '||p.area||' '||'Perimeter '||p.calper);
+end;
+
+
+
+
+
+
+
+
+
+
+fair#lpu#opt2#
+
+
+String function
+
+1 upper(String)
+lower
+inticap
+reverse
+length
+replace
+substr select substr('Welcome',4,2)
+lpad 
+rpad(string,length,chr)
+ltrim remove white space.
+rtrim
+concat
+Q1. Sort array element.
+Q2. fetch the name from the table and display name and data
+Q3.Select name first character capital.
+
+select * from tablename where name like initcap(name);
+open n for select* from tablename where ascii(substr(name,1,1))>=65 and ..<=90;
+ascii('A') dual ;
+
+
+declare
+    n number;
+procedure p(a in number) is
+    i number;
+    rev number:=0;
+    r number;
+begin    
+    while a>0
+    loop
+        r:=mod(a,10);
+        rev:=(rev*10)+r;
+        n:=trunc(n/10);
+    end loop;
+    dbms_output.put_line('reverse is '||rev); 
+end p;
+begin
+n:=10767;
+p(n);
+end;
+
+how tp pass ref_cursor as procedure arguments.
+
+Procedue:::
+declare
+type cr is ref cursor;
+c1 cr;
+type rect is Record
+(
+name varchar2(20),
+age integer
+);
+r rect;
+procedure p(c1 cr) is 
+begin
+loop
+fetch c1 into r;
+exit when c1%notfound;
+dbms_output.put_line(r.name);
+end loop;
+end p;
+begin
+loop
+open c1 for select name,roll from t1 where rollno>3;
+exit when c1%notfound;
+p1(c1);
+end loop;
+end;
+
+
+Subtype
+::
+
+declare 
+subtype s1 is varchar(20);
+subtype t is integer;
+name s1;
+t1 t;
+begin
+name:='&n';
+t1:='&t1';
+dbms_output.put_line(name||t1);
+end;
+
+
+declare
+subtype s1 is varchar(20) NOT NULL;
+subtype t is varchar(20);
+s s1;
+x t;
+begin
+s:='&a';
+x:='&b';
+s:=x;
+dbms_output.put_line(s||x);
+end;
+
+--Salary top 3--
+declare 
+cursor c1 is select * from empl ;
+r empl%rowtype;
+begin
+open c1;
+loop
+fetch c1 into r;
+exit when (c1%rowcount>3);
+dbms_output.put_line(r.name||' '||r.salary);
+end loop;
+close c1;
+end;
+
+opt2
+lpu#
+west#
+
+
+--2nd highest salary--
+declare 
+cursor c1 is select distinct salary from empl order by salary desc;
+r empl.salary%type;
+begin
+open c1;
+loop
+fetch c1 into r;
+exit when (c1%notfound);
+if(c1%rowcount=2) then
+dbms_output.put_line('The second highest salary:: '||r);
+end if;
+end loop;
+close c1;
+end;
+
+--Date No of days--
+SELECT ename,round((SYSDATE-hiredate))FROM emp;
+
+declare 
+type n is ref cursor;
+n1 n;
+subtype s1 is varchar(10);
+subtype t1 is number;
+s s1;
+x t1;
+begin
+open n1 for SELECT ename,round((SYSDATE-hiredate)) FROM emp order by hiredate ;
+loop
+fetch n1 into s,x;
+exit when n1%notfound;
+dbms_output.put_line(s||' '||x);
+end loop;
+close n1;
+end;
+
+
+
+---------------------------------------------------------------------------
+
+Scalar functions-greatest,least
+Aggregrate functions-sum,max,min
+Parameterized Cursor
+Declare 
+cursor c1(i number) is select sum(salary) from t1 where id>i;
+v_id t1.id%type;
+s number;
+begin
+open c1(5);
+fetch c1 into s;
+dbms_output.put_line(s);
+end;
+
+---------------------------------------------------------------------------
+declare
+cursor c1(i number) is select sum(sal) from emp where empno>i;
+s number;
+begin
+open c1(7000);
+fetch c1 into s;
+dbms_output.put_line(s);
+close c1;
+end;
+
+----------------------------------------------------------------------------
+
+declare
+cursor c1(n emp.ename%type) is select ename from emp where job>n;
+i emp.ename%type;
+begin
+open c1('MANAGER');
+loop
+fetch c1 into i;
+exit when c1%notfound;
+dbms_output.put_line(i);
+end loop;
+close c1;
+end;
+--------------------------------------------------------------------------
+where rollno in(1,3);
+--------------------------------------------------------------------------
+declare
+cursor c1(i number,j number) is select ename from emp where empno=i or empno=j;
+n emp.ename%type;
+begin
+open c1(7839,7780);
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n);
+end loop;
+close c1;
+end;
+-----------------------------------------------------------------------------
+
+declare
+cursor c1(i number,j varchar2) is select ename from emp where empno>i and job=j;
+n emp.ename%type;
+begin
+open c1(7000,'MANAGER');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n);
+end loop;
+close c1;
+end;
+
+----------------------------------------------------------------------------
+From the user
+declare
+cursor c1(i number,j varchar2) is select ename from emp where empno>i and job=j;
+n emp.ename%type;
+begin
+open c1(:b,:c);
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n);
+end loop;
+close c1;
+end;
+
+-----------------------------------------------------------------------------
+show multpile data ::::::
+----------------------------------------------
+declare
+cursor c1(i number) is select ename,job from emp where empno>i;
+type rect is Record
+(
+name varchar2(20),
+jb varchar2(9)
+);
+n rect;
+begin
+open c1(7800);
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.name||' '||n.jb);
+end loop;
+close c1;
+end;
+------------------------------------------------------------------------------
+declare
+cursor c1(i varchar2) is select cust_first_name,cust_last_name from demo_customers where cust_first_name=i or cust_last_name=i;
+type rect is Record
+(
+fn varchar2(20),
+ln varchar2(20)
+);
+n rect;
+begin
+open c1('Edward');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.fn||' '||n.ln);
+end loop;
+close c1;
+end;
+
+-----------
+Fetch all name having same first/last or name:::
+declare
+cursor c1(i varchar2) is select cust_first_name,cust_last_name from demo_customers where cust_first_name like i or cust_last_name like i;
+type rect is Record
+(
+fn varchar2(20),
+ln varchar2(20)
+);
+n rect;
+begin
+open c1('Edward%');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.fn||' '||n.ln);
+end loop;
+close c1;
+end;
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+declare
+cursor c1(i varchar2) is select * from demo_customers where cust_first_name like i or cust_last_name like i;
+n demo_customers%rowtype;
+begin
+open c1('Edward%');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.cust_first_name||' '||n.cust_last_name);
+end loop;
+close c1;
+end;
+--------------------------------------------------------------------------------------- 
+
+
+declare
+type ar1 is varray(5) of number;
+type ar2 is varray(5) of number;
+a ar1;
+b ar2;
+c number:=0;
+begin
+a:=ar1(5,7,8,9,1);
+b:=ar2(5,7,6,9,1);
+for i in 1..5 loop 
+if(a(i)!=b(i)) then
+c:=1;
+end if;
+end loop;
+if(c=0) then
+dbms_output.put_line('Equal');
+else
+dbms_output.put_line('Not Equal');
+end if;
+end;
+
+
+-----------------------------------
+
+
+declare
+type ar1 is varray(5) of varchar2(20);
+type ar2 is varray(5) of varchar2(20);
+a ar1;
+b ar2;
+c number:=0;
+begin
+a:=ar1('aa','bb','cb','dd','ee');
+b:=ar2('aa','bb','cc','dd','ee');
+for i in 1..5 loop 
+if(a(i)!=b(i)) then
+c:=1;
+end if;
+end loop;
+if(c=0) then
+dbms_output.put_line('Equal');
+else
+dbms_output.put_line('Not Equal');
+end if;
+end;
+
+-----------------------------------------------------------------------------
+
+declare
+cursor c1(i varchar2) is select * from demo_customers where cust_city like i;
+n demo_customers%rowtype;
+n1 number;
+begin
+open c1('%g');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+n1:=c1%rowcount;
+end loop;
+dbms_output.put_line(n1);
+close c1;
+end;
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+declare
+cursor c1(i varchar2) is select * from demo_customers where cust_city like i;
+n demo_customers%rowtype;
+n1 number;
+begin
+
+
+
+
+
+open c1('%g');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+n1:=c1%rowcount;
+dbms_output.put_line(n.cust_first_name||' '||n.cust_state);
+end loop;
+dbms_output.put_line(n1);
+close c1;
+end;
+
+----------------------------------------------------------------------------
+
+lob
+clob
+blob
+declare
+l blob;
+begin
+select pic into l from t1 where roll=3;
+dbms_output.put_line('Length:: '||dbms_lob.getlength(l));
+end;
+
+
+select rawtohex('0FF') from dual;
+
+----------------------------------------------------------------------------
+
+pl/sql objects
+create or replace type type_name as object;
+name varchar(10);
+rollno varchar(14);
+class varchar(10);
+city varchar(10);
+);
+
+declare 
+o o1;
+begin
+o:=o1('Abc','1','BCA','Jal');
+dbms_output.put_line(o.name||o.rollno);
+end;
+
+
+create or replace type t2 as object
+(
+var1 number,
+member procedure display
+);
+
+create or replace type body t2 
+is 
+member procedure display is
+begin
+dbms_output.put_line(var1);
+end;
+end;
+
+declare 
+v t2:=t2(:v);
+begin
+v.display;
+end;
+
+
+
+
+create or replace type body t3 
+is 
+member procedure display is
+begin
+if (var1=var2) then
+dbms_output.put_line('Equal');
+end if;
+end;
+end;
+
+create or replace type t3 as object
+(
+var1 number,
+var2 number,
+member procedure display
+);
+
+declare 
+v t3:=t3(:x,:y);
+begin
+v.display;
+end;
+---------------------------------------------------------------------
+Function:::::
+
+declare 
+a number;
+b number;
+z number;
+function fname(a in number, b in number)
+return number
+is
+c number;
+begin 
+if(a>b) then
+c:=a;
+else
+c:=b;
+return c;
+end if;
+end fname;
+begin
+z:=fname(:a,:b);
+dbms_output.put_line(z);
+end;
+
+
+
+
+--------------------------------------------------------------------------------
+parameter function
+
+declare 
+a number;
+function fname(a in number)
+return varchar2
+is
+n stu.name%type;
+begin 
+select name into n from stu where id = a; 
+return n;
+end fname;
+begin
+dbms_output.put_line('Info:: '||fname(:a));
+end;
+
+
+
+
+
+create or replace type x1 as object
+(
+var1 varchar2(20),
+member function fname(a in number) return x1,
+member procedure display
+);
+
+
+create or replace type body x1 
+as 
+member function fname(a in number) return x1 is 
+begin
+select name into n from stu where id = a; 
+return n;
+end fname;
+member procedure display is 
+ begin  
+      dbms_output.put_line(var1); 
+   end display;  
+end;
+
+-----------------------------------------------------------------------------
+create or replace type o1 is object
+(
+Roll number,
+Name varchar(20),
+member function f1 return number,
+member function f2 return varchar
+);
+
+
+create or replace type body o1 as 
+member function f1 return number is 
+begin 
+return roll;
+end;
+member function f2 return varchar is 
+begin 
+return name;
+end;
+end;
+
+
+declare
+o o1:=o1(5,'Ankit');
+begin
+dbms_output.put_line(o.f1||' '||o.f2);
+end;
+
+
+----------------------------------------------------------------------------
+function overloading
+
+declare
+a number:=4;
+b number:=10;
+d number:=90;
+function large(a in number, b in number) return number is c number;
+begin 
+if(a>b) then
+c:=a;
+else
+c:=b;
+end if;
+return c;
+end;
+function large(a in number, b in number, d in number) return number is
+e number;
+begin 
+if(a>b) and (a>d) then
+e:=a;
+else if (b>a) and (b>d) then
+e:=b;
+else
+e:=d;
+end if;
+end if;
+return e;
+end;
+begin
+dbms_output.put_line(large(a,b));
+dbms_output.put_line(large(a,b,d));
+end;
+
+----------------------------------------------------------------------------
+Inheritence:::::::
+ 
+create or replace type p1 is object
+(
+roll  number,
+name varchar2(20),
+member function t1 return number
+) not final;
+
+--body of p1
+
+create or replace type body p1 as 
+member function t1 return number is 
+begin 
+return roll;
+end;
+end;
+
+create or replace type q1 under p1
+(
+member function t2 return varchar2
+)
+---body of q1
+create or replace type body q1 as 
+member function t2 return varchar2 is 
+begin 
+return name;
+end;
+end;
+
+declare 
+q q1:=q1(5,'Abc12');
+begin
+dbms_output.put_line(q.t1||q.t2);
+end;
+
+
+-----------------------------------------------------------------------------
+
+create or replace type per is object
+(
+r number,
+h number,
+member function area return number
+)not final;
+
+create or replace type body per as 
+member function area return number
+is
+begin 
+return (2*3.14*r*h);
+end;
+end;
+
+create or replace type per1 under per 
+(
+member function calper return number
+)
+
+create or replace type body per1 as 
+member function calper return number
+is
+begin
+return (2*3.14*r+2*h);
+end;
+end;
+
+
+declare
+p per1:=per1(6,10);
+begin
+dbms_output.put_line('Area '||p.area||' '||'Perimeter '||p.calper);
+end;
+
+
+
+
+
+
+
+
+
+
+String function
+1 upper(String)
+lower
+inticap
+reverse
+length
+replace
+substr select substr('Welcome',4,2)
+lpad 
+rpad(string,length,chr)
+ltrim remove white space.
+rtrim
+concat
+Q1. Sort array element.
+Q2. fetch the name from the table and display name and data
+Q3.Select name first character capital.
+
+select * from tablename where name like initcap(name);
+open n for select* from tablename where ascii(substr(name,1,1))>=65 and ..<=90;
+ascii('A') dual ;
+
+
+declare
+    n number;
+procedure p(a in number) is
+    i number;
+    rev number:=0;
+    r number;
+begin    
+    while a>0
+    loop
+        r:=mod(a,10);
+        rev:=(rev*10)+r;
+        n:=trunc(n/10);
+    end loop;
+    dbms_output.put_line('reverse is '||rev); 
+end p;
+begin
+n:=10767;
+p(n);
+end;
+
+how tp pass ref_cursor as procedure arguments.
+
+Procedue:::
+declare
+type cr is ref cursor;
+c1 cr;
+type rect is Record
+(
+name varchar2(20),
+age integer
+);
+r rect;
+procedure p(c1 cr) is 
+begin
+loop
+fetch c1 into r;
+exit when c1%notfound;
+dbms_output.put_line(r.name);
+end loop;
+end p;
+begin
+loop
+open c1 for select name,roll from t1 where rollno>3;
+exit when c1%notfound;
+p1(c1);
+end loop;
+end;
+
+
+Subtype
+::
+
+declare 
+subtype s1 is varchar(20);
+subtype t is integer;
+name s1;
+t1 t;
+begin
+name:='&n';
+t1:='&t1';
+dbms_output.put_line(name||t1);
+end;
+
+
+declare
+subtype s1 is varchar(20) NOT NULL;
+subtype t is varchar(20);
+s s1;
+x t;
+begin
+s:='&a';
+x:='&b';
+s:=x;
+dbms_output.put_line(s||x);
+end;
+
+--Salary top 3--
+declare 
+cursor c1 is select * from empl ;
+r empl%rowtype;
+begin
+open c1;
+loop
+fetch c1 into r;
+exit when (c1%rowcount>3);
+dbms_output.put_line(r.name||' '||r.salary);
+end loop;
+close c1;
+end;
+
+opt2
+lpu#
+west#
+
+
+--2nd highest salary--
+declare 
+cursor c1 is select distinct salary from empl order by salary desc;
+r empl.salary%type;
+begin
+open c1;
+loop
+fetch c1 into r;
+exit when (c1%notfound);
+if(c1%rowcount=2) then
+dbms_output.put_line('The second highest salary:: '||r);
+end if;
+end loop;
+close c1;
+end;
+
+--Date No of days--
+SELECT ename,round((SYSDATE-hiredate))FROM emp;
+
+declare 
+type n is ref cursor;
+n1 n;
+subtype s1 is varchar(10);
+subtype t1 is number;
+s s1;
+x t1;
+begin
+open n1 for SELECT ename,round((SYSDATE-hiredate)) FROM emp order by hiredate ;
+loop
+fetch n1 into s,x;
+exit when n1%notfound;
+dbms_output.put_line(s||' '||x);
+end loop;
+close n1;
+end;
+
+
+
+---------------------------------------------------------------------------
+
+Scalar functions-greatest,least
+Aggregrate functions-sum,max,min
+Parameterized Cursor
+Declare 
+cursor c1(i number) is select sum(salary) from t1 where id>i;
+v_id t1.id%type;
+s number;
+begin
+open c1(5);
+fetch c1 into s;
+dbms_output.put_line(s);
+end;
+
+---------------------------------------------------------------------------
+declare
+cursor c1(i number) is select sum(sal) from emp where empno>i;
+s number;
+begin
+open c1(7000);
+fetch c1 into s;
+dbms_output.put_line(s);
+close c1;
+end;
+
+----------------------------------------------------------------------------
+
+declare
+cursor c1(n emp.ename%type) is select ename from emp where job>n;
+i emp.ename%type;
+begin
+open c1('MANAGER');
+loop
+fetch c1 into i;
+exit when c1%notfound;
+dbms_output.put_line(i);
+end loop;
+close c1;
+end;
+--------------------------------------------------------------------------
+where rollno in(1,3);
+--------------------------------------------------------------------------
+declare
+cursor c1(i number,j number) is select ename from emp where empno=i or empno=j;
+n emp.ename%type;
+begin
+open c1(7839,7780);
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n);
+end loop;
+close c1;
+end;
+-----------------------------------------------------------------------------
+
+declare
+cursor c1(i number,j varchar2) is select ename from emp where empno>i and job=j;
+n emp.ename%type;
+begin
+open c1(7000,'MANAGER');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n);
+end loop;
+close c1;
+end;
+
+----------------------------------------------------------------------------
+From the user
+declare
+cursor c1(i number,j varchar2) is select ename from emp where empno>i and job=j;
+n emp.ename%type;
+begin
+open c1(:b,:c);
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n);
+end loop;
+close c1;
+end;
+
+-----------------------------------------------------------------------------
+show multpile data ::::::
+----------------------------------------------
+declare
+cursor c1(i number) is select ename,job from emp where empno>i;
+type rect is Record
+(
+name varchar2(20),
+jb varchar2(9)
+);
+n rect;
+begin
+open c1(7800);
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.name||' '||n.jb);
+end loop;
+close c1;
+end;
+------------------------------------------------------------------------------
+declare
+cursor c1(i varchar2) is select cust_first_name,cust_last_name from demo_customers where cust_first_name=i or cust_last_name=i;
+type rect is Record
+(
+fn varchar2(20),
+ln varchar2(20)
+);
+n rect;
+begin
+open c1('Edward');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.fn||' '||n.ln);
+end loop;
+close c1;
+end;
+
+-----------
+Fetch all name having same first/last or name:::
+declare
+cursor c1(i varchar2) is select cust_first_name,cust_last_name from demo_customers where cust_first_name like i or cust_last_name like i;
+type rect is Record
+(
+fn varchar2(20),
+ln varchar2(20)
+);
+n rect;
+begin
+open c1('Edward%');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.fn||' '||n.ln);
+end loop;
+close c1;
+end;
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+declare
+cursor c1(i varchar2) is select * from demo_customers where cust_first_name like i or cust_last_name like i;
+n demo_customers%rowtype;
+begin
+open c1('Edward%');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+dbms_output.put_line(n.cust_first_name||' '||n.cust_last_name);
+end loop;
+close c1;
+end;
+--------------------------------------------------------------------------------------- 
+
+
+declare
+type ar1 is varray(5) of number;
+type ar2 is varray(5) of number;
+a ar1;
+b ar2;
+c number:=0;
+begin
+a:=ar1(5,7,8,9,1);
+b:=ar2(5,7,6,9,1);
+for i in 1..5 loop 
+if(a(i)!=b(i)) then
+c:=1;
+end if;
+end loop;
+if(c=0) then
+dbms_output.put_line('Equal');
+else
+dbms_output.put_line('Not Equal');
+end if;
+end;
+
+
+-----------------------------------
+
+
+declare
+type ar1 is varray(5) of varchar2(20);
+type ar2 is varray(5) of varchar2(20);
+a ar1;
+b ar2;
+c number:=0;
+begin
+a:=ar1('aa','bb','cb','dd','ee');
+b:=ar2('aa','bb','cc','dd','ee');
+for i in 1..5 loop 
+if(a(i)!=b(i)) then
+c:=1;
+end if;
+end loop;
+if(c=0) then
+dbms_output.put_line('Equal');
+else
+dbms_output.put_line('Not Equal');
+end if;
+end;
+
+-----------------------------------------------------------------------------
+
+declare
+cursor c1(i varchar2) is select * from demo_customers where cust_city like i;
+n demo_customers%rowtype;
+n1 number;
+begin
+open c1('%g');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+n1:=c1%rowcount;
+end loop;
+dbms_output.put_line(n1);
+close c1;
+end;
+
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+declare
+cursor c1(i varchar2) is select * from demo_customers where cust_city like i;
+n demo_customers%rowtype;
+n1 number;
+begin
+open c1('%g');
+loop
+fetch c1 into n;
+exit when c1%notfound;
+n1:=c1%rowcount;
+dbms_output.put_line(n.cust_first_name||' '||n.cust_state);
+end loop;
+dbms_output.put_line(n1);
+close c1;
+end;
+
+
+
+set serveroutput on;
+DECLARE
+   TYPE NumList IS TABLE OF INTEGER;
+   n NumList := NumList(2,4,6,8);
+BEGIN
+   dbms_output.put_line('before extend ' || n.COUNT || ' elements.');
+   n.EXTEND(4,4);
+   dbms_output.put_line('After extend ' || n.COUNT || ' elements.');
+  
+for i in 1..n.count loop
+dbms_output.put_line(n(i));
+end loop;
+end;
+
+
+
+create or replace type oo1 as object
+(
+h number,
+w number,
+member function display return number,
+not instantiable member function info return number )
+not instantiable not final;
+
+create or replace type body oo1 as
+member function display return number is 
+begin
+dbms_output.put_line('inside function');
+return h*w;
+end;
+end;
+
+
+create or replace type oo2 under oo1 
+(
+
+overriding member function info return number
+
+)
+
+create or replace type body oo2 as 
+overriding member function info return number is 
+begin 
+return (h*w);
+end;
+end;
+
+declare
+x oo2;
+begin
+x:=new oo2(10,5);
+dbms_output.put_line(x.info||x.display);
+end;
+
+
+
+
+// multilevle
+--program to implement the concept of multilevel inheritance
+create or replace type firstobj as object(
+    name varchar(10)
+)not final;
+
+create or replace type secondobj under firstobj (
+    age number
+)not final;
+
+create or replace type thirdobj under secondobj (
+   section varchar2(10),
+   member procedure display
+)
+
+create or replace type body thirdobj is
+member procedure display is
+begin
+dbms_output.put_line(name||age||section);
+end;
+end;
+
+declare
+a thirdobj:=thirdobj('Vivek',22,'MCA');
+begin
+a.display;
+end;
+
+
+
+DECLARE 
+  
+   type arraynum IS VARRAY(5) OF number; 
+   num arraynum; 
+   m number; 
+   total number;
+BEGIN 
+   
+   num:= arraynum(98, 97, 78, 87, 92); 
+ 
+
+   FOR i in 1 .. 5 LOOP 
+       For j in 1 .. 4 loop
+        if (num(j)>num(j+1)) then
+           m:= num(j);
+          num(j):=num(j+1);
+           num(j+1):= m;
+      end if;
+    End Loop;
+   END LOOP;
+
+for i in 1 .. 5 loop
+dbms_output.put_line(num(i));
+end loop; 
+END;
+
+
+
+
+
